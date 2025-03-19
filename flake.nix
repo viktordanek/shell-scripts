@@ -202,7 +202,7 @@
                                                                                                                 environment =
                                                                                                                     { pathInteger , pathString , string } :
                                                                                                                         [
-                                                                                                                            # ( pathInteger "ALPHA" 1 )
+                                                                                                                            ( pathInteger "ALPHA" 1 )
                                                                                                                             # ( pathString "BETA" 2 )
                                                                                                                             ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
                                                                                                                             ( string "MESSAGE" "5875755ac3b432182a8817350e1994539d0b5c3ef238169ee7923dc498eea2a6cb9cbe242c7763f88e3c5e59b6050e03e215ca26201ced47157f6025f6e876b3" )
