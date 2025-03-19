@@ -159,7 +159,7 @@
                                                                                         [
                                                                                             "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ]
-                                                                                        ( builtins.concatList list )
+                                                                                        ( builtins.concatLists list )
                                                                                     ] ;
                                                                         set =
                                                                             path : set :
@@ -202,8 +202,8 @@
                                                                                                                 environment =
                                                                                                                     { pathInteger , pathString , string } :
                                                                                                                         [
-                                                                                                                            ( pathInteger "ALPHA" 1 )
-                                                                                                                            ( pathString "BETA" 2 )
+                                                                                                                            # ( pathInteger "ALPHA" 1 )
+                                                                                                                            # ( pathString "BETA" 2 )
                                                                                                                             ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
                                                                                                                             ( string "MESSAGE" "5875755ac3b432182a8817350e1994539d0b5c3ef238169ee7923dc498eea2a6cb9cbe242c7763f88e3c5e59b6050e03e215ca26201ced47157f6025f6e876b3" )
                                                                                                                         ] ;
@@ -219,7 +219,7 @@
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt 0 ( shell-scripts.shell-scripts.foo ) ) } &&
+                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) } &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } &&
                                                                             exit 44
                                                                     '' ;
