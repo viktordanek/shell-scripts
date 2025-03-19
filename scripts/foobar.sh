@@ -1,1 +1,1 @@
-${ECHO} ${MESSAGE}
+${ECHO} ${MESSAGE} ${ALPHA} ${BETA}
