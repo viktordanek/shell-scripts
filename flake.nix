@@ -96,6 +96,15 @@
                                                                                                         environment = environment ;
                                                                                                         extensions =
                                                                                                             {
+                                                                                                                is-interactive =
+                                                                                                                    { name ? "IS_INTERACTIVE" } :
+                                                                                                                        "--run 'export ${ name }=$( if [ -t 0 ] ; then ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/true ; else ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/false ; fi )'" ;
+                                                                                                                is-pipe =
+                                                                                                                    { name ? "IS_PIPE" } :
+                                                                                                                        "--run 'export ${ name }=$( if [ -p /proc/self/fd/0 ] ; then ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/true ; else ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/false ; fi )'" ;
+                                                                                                                is-file =
+                                                                                                                    { name ? "IS_FILE" } :
+                                                                                                                        "--run 'export ${ name }=$( if [ -f /proc/self/fd/0 ] ; then ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/true ; else ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/false ; fi )'" ;
                                                                                                                 path-int =
                                                                                                                     name : index :
                                                                                                                         if builtins.typeOf index == "int" then
@@ -103,10 +112,10 @@
                                                                                                                             else if index >= builtins.length path then builtins.throw "The index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is greater than or equal to the length of the path ${ builtins.toString ( builtins.length path ) }."
                                                                                                                             else
                                                                                                                                 if builtins.typeOf ( builtins.elemAt path index ) == "int" then "--set ${ name } ${ builtins.toString ( builtins.elemAt path index ) }"
-                                                                                                                                else if builtins.typeOf ( builtins.elemAt path index ) == "string" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is a string and not an int it would be better to use pathString."
+                                                                                                                                else if builtins.typeOf ( builtins.elemAt path index ) == "string" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is a string and not an int it would be better to use path-string."
                                                                                                                                 else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
                                                                                                                         else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
-                                                                                                                pathString =
+                                                                                                                path-string =
                                                                                                                     name : index :
                                                                                                                         if builtins.typeOf index == "int" then
                                                                                                                             if index < 0 then builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is less than zero."
@@ -200,12 +209,16 @@
                                                                                                         shell-script
                                                                                                             {
                                                                                                                 environment =
-                                                                                                                    { path-int , pathString , string } :
+                                                                                                                    { is-file , is-interactive , is-pipe , path-int , path-string , string } :
                                                                                                                         [
-                                                                                                                            ( path-int "ALPHA" 1 )
-                                                                                                                            ( pathString "BETA" 2 )
-                                                                                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
-                                                                                                                            ( string "MESSAGE" "5875755ac3b432182a8817350e1994539d0b5c3ef238169ee7923dc498eea2a6cb9cbe242c7763f88e3c5e59b6050e03e215ca26201ced47157f6025f6e876b3" )
+                                                                                                                            ( is-file { } )
+                                                                                                                            ( is-interactive { } )
+                                                                                                                            ( is-pipe { } )
+                                                                                                                            ( string "JQ" "${ pkgs.jq }/bin/jq" )
+                                                                                                                            ( path-int "PATH_INT" 1 )
+                                                                                                                            ( path-string "PATH_STRING" 2 )
+                                                                                                                            ( string "TEMPLATE_FILE" ( self + "/scripts/foobar.json" ) )
+                                                                                                                            ( string "YQ" "${ pkgs.yq }/bin/yq" )
                                                                                                                         ] ;
                                                                                                                 script = self + "/scripts/foobar.sh" ;
                                                                                                                 tests =
