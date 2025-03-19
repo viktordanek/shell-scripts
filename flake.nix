@@ -110,7 +110,7 @@
                                                                                                                     name : index :
                                                                                                                         if builtins.typeOf index == "int" then
                                                                                                                             if index < 0 then builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is less than zero."
-                                                                                                                            else if index >= builtins.toString ( builtins.length path ) then builtins.throw "The index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is greater than or equal to the length of the path ${ builtins.toString ( builtins.length path ) }."
+                                                                                                                            else if index >= builtins.length path then builtins.throw "The index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is greater than or equal to the length of the path ${ builtins.toString ( builtins.length path ) }."
                                                                                                                             else
                                                                                                                                 if builtins.typeOf ( builtins.elemAt path index ) == "string" then "--set ${ name } ${ builtins.elemAt path index }"
                                                                                                                                 else if builtins.typeOf ( builtins.elemAt path index ) == "int" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is an int and not a string it would be better to use path-int."
@@ -203,7 +203,7 @@
                                                                                                                     { path-int , pathString , string } :
                                                                                                                         [
                                                                                                                             ( path-int "ALPHA" 1 )
-                                                                                                                            # ( pathString "BETA" 2 )
+                                                                                                                            ( pathString "BETA" 2 )
                                                                                                                             ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
                                                                                                                             ( string "MESSAGE" "5875755ac3b432182a8817350e1994539d0b5c3ef238169ee7923dc498eea2a6cb9cbe242c7763f88e3c5e59b6050e03e215ca26201ced47157f6025f6e876b3" )
                                                                                                                         ] ;
