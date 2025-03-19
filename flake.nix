@@ -187,9 +187,18 @@
                                             {
                                                 installPhase =
                                                     let
+                                                        shell-scripts =
+                                                            lib
+                                                                {
+                                                                    shell-scripts =
+                                                                        {
+
+                                                                        } ;
+                                                                } ;
                                                         in
                                                             ''
                                                                 ${ pkgs.coreutils }/bin/touch $out &&
+                                                                    ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } &&
                                                                     exit 44
                                                             '' ;
                                                 name = "foobar" ;
