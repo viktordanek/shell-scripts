@@ -83,7 +83,7 @@
                                                                                 environment ? x : [ ] ,
                                                                                 script ,
                                                                                 tests ? null
-                                                                            } : derivation :
+                                                                            } : ignore :
                                                                                 let
                                                                                     eval =
                                                                                         _shell-script
@@ -120,7 +120,7 @@
                                         shell-scripts =
                                             _visitor
                                                 {
-                                                    lambda = path : value : builtins.concatStringsSep "/" ( builtins.concatLists [ [ derivation ] ( builtins.map builtins.toJSON path ) ] ) ;
+                                                    lambda = path : value : "" ;
                                                 }
                                                 {
                                                 }
@@ -139,7 +139,7 @@
                                                                         lambda =
                                                                             path : value :
                                                                                 let
-                                                                                    primary = value derivation ;
+                                                                                    primary = value null ;
                                                                                     in
                                                                                         [
                                                                                             "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
@@ -192,13 +192,25 @@
                                                                 {
                                                                     shell-scripts =
                                                                         {
-
+                                                                            foobar =
+                                                                                { shell-script , ... } :
+                                                                                    shell-script
+                                                                                        {
+                                                                                            environment =
+                                                                                                { string , ... } :
+                                                                                                    [
+                                                                                                        ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                                        ( string "MESSAGE" "5875755ac3b432182a8817350e1994539d0b5c3ef238169ee7923dc498eea2a6cb9cbe242c7763f88e3c5e59b6050e03e215ca26201ced47157f6025f6e876b3" )
+                                                                                                    ] ;
+                                                                                            script = self + "/scripts/foobar.sh" ;
+                                                                                            tests = null ;
+                                                                                        } ;
                                                                         } ;
                                                                 } ;
                                                         in
                                                             ''
                                                                 ${ pkgs.coreutils }/bin/touch $out &&
-                                                                    ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } &&
+                                                                    ${ pkgs.coreutils }/bin/echo &&
                                                                     exit 44
                                                             '' ;
                                                 name = "foobar" ;
