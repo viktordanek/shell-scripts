@@ -182,6 +182,19 @@
                             pkgs = builtins.import nixpkgs { system = system ; } ;
                             in
                                 {
+                                    checks.foobar =
+                                        pkgs.stdenv.mkDerivation
+                                            {
+                                                installPhase =
+                                                    let
+                                                        in
+                                                            ''
+                                                                ${ pkgs.coreutils }/bin/touch $out &&
+                                                                    exit 44
+                                                            '' ;
+                                                name = "foobar" ;
+                                                src = ./. ;
+                                            } ;
                                     lib = lib ;
                                 } ;
                 in flake-utils.lib.eachDefaultSystem fun ;
