@@ -3,7 +3,10 @@
         {
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
-            shell-script.url = "github:viktordanek/shell-script" ;
+            shell-script =
+                {
+                    url = "github:viktordanek/shell-script/30961d947d9ee42e39e8b9cb0379ad7b34f426b9" ;
+                } ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
@@ -23,7 +26,7 @@
                                         _shell-scripts =
                                             _visitor
                                                 {
-                                                    lambda = path : value : "" ;
+                                                    lambda = path : value : builtins.concatStringsSep "/" ( builtins.concatLists [ [ derivation ] ( builtins.map builtins.toJSON path ) ] ) ;
                                                 }
                                                 {
                                                 }
@@ -94,29 +97,33 @@
                                                                             } : ignore :
                                                                                 let
                                                                                     eval =
-                                                                                        _shell-script
-                                                                                            {
-                                                                                                environment = environment ;
-                                                                                                extensions =
-                                                                                                    [
-                                                                                                        {
-                                                                                                            name = path ;
-                                                                                                            value =
-                                                                                                                name : index :
-                                                                                                                    if builtins.typeOf index == "int" then
-                                                                                                                        if index >= 0 && index < builtins.length path then builtins.elemAt path index
-                                                                                                                        else if index < 0 then builtins.throw "index (${ builtins.toString index }) is less than zero at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }."
-                                                                                                                        else builtins.throw "index (${ builtins.toString index}) is greater than the path length (${ builtins.toString ( builtins.length path ) }) at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }."
-                                                                                                                    else builtins.throw "index is not int but ${ builtins.typeOf index } at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
-                                                                                                        }
-                                                                                                        {
-                                                                                                            name = "string" ;
-                                                                                                            value = name : value : "--set ${ name } ${ builtins.toString value }" ;
-                                                                                                        }
-                                                                                                    ] ;
-                                                                                                name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt ( ( builtins.length path ) - 1 ) else default-name ) ;
-                                                                                                tests = tests ;
-                                                                                            } ;
+                                                                                        builtins.tryEval
+                                                                                            (
+                                                                                                _shell-script
+                                                                                                    {
+                                                                                                        environment = environment ;
+                                                                                                        extensions =
+                                                                                                            [
+                                                                                                                {
+                                                                                                                    name = path ;
+                                                                                                                    value =
+                                                                                                                        name : index :
+                                                                                                                            if builtins.typeOf index == "int" then
+                                                                                                                                if index >= 0 && index < builtins.length path then builtins.elemAt path index
+                                                                                                                                else if index < 0 then builtins.throw "index (${ builtins.toString index }) is less than zero at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }."
+                                                                                                                                else builtins.throw "index (${ builtins.toString index}) is greater than the path length (${ builtins.toString ( builtins.length path ) }) at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }."
+                                                                                                                            else builtins.throw "index is not int but ${ builtins.typeOf index } at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
+                                                                                                                }
+                                                                                                                {
+                                                                                                                    name = "string" ;
+                                                                                                                    value = name : value : "--set ${ name } ${ builtins.toString value }" ;
+                                                                                                                }
+                                                                                                            ] ;
+                                                                                                        name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
+                                                                                                        script = script ;
+                                                                                                        tests = tests ;
+                                                                                                    }
+                                                                                            ) ;
                                                                                     in
                                                                                         if eval.success then eval.value
                                                                                         else builtins.throw "There was a problem evaluating the shell-script defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
