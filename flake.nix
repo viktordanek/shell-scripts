@@ -210,7 +210,7 @@
                                                         in
                                                             ''
                                                                 ${ pkgs.coreutils }/bin/touch $out &&
-                                                                    ${ pkgs.coreutils }/bin/echo &&
+                                                                    ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.foobar } &&
                                                                     exit 44
                                                             '' ;
                                                 name = "foobar" ;
