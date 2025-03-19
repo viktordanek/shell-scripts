@@ -103,22 +103,9 @@
                                                                                                     {
                                                                                                         environment = environment ;
                                                                                                         extensions =
-                                                                                                            [
-                                                                                                                {
-                                                                                                                    name = path ;
-                                                                                                                    value =
-                                                                                                                        name : index :
-                                                                                                                            if builtins.typeOf index == "int" then
-                                                                                                                                if index >= 0 && index < builtins.length path then builtins.elemAt path index
-                                                                                                                                else if index < 0 then builtins.throw "index (${ builtins.toString index }) is less than zero at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }."
-                                                                                                                                else builtins.throw "index (${ builtins.toString index}) is greater than the path length (${ builtins.toString ( builtins.length path ) }) at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }."
-                                                                                                                            else builtins.throw "index is not int but ${ builtins.typeOf index } at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
-                                                                                                                }
-                                                                                                                {
-                                                                                                                    name = "string" ;
-                                                                                                                    value = name : value : "--set ${ name } ${ builtins.toString value }" ;
-                                                                                                                }
-                                                                                                            ] ;
+                                                                                                            {
+                                                                                                                string = name : value : "--set ${ name } ${ builtins.toString value }" ;
+                                                                                                            } ;
                                                                                                         name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
                                                                                                         script = script ;
                                                                                                         tests = tests ;
@@ -189,40 +176,43 @@
                             pkgs = builtins.import nixpkgs { system = system ; } ;
                             in
                                 {
-                                    checks.foobar =
-                                        pkgs.stdenv.mkDerivation
-                                            {
-                                                installPhase =
-                                                    let
-                                                        shell-scripts =
-                                                            lib
-                                                                {
-                                                                    shell-scripts =
+                                    checks =
+                                        {
+                                            foobar =
+                                                pkgs.stdenv.mkDerivation
+                                                    {
+                                                        installPhase =
+                                                            let
+                                                                shell-scripts =
+                                                                    lib
                                                                         {
-                                                                            foobar =
-                                                                                { shell-script , ... } :
-                                                                                    shell-script
-                                                                                        {
-                                                                                            environment =
-                                                                                                { string , ... } :
-                                                                                                    [
-                                                                                                        ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
-                                                                                                        ( string "MESSAGE" "5875755ac3b432182a8817350e1994539d0b5c3ef238169ee7923dc498eea2a6cb9cbe242c7763f88e3c5e59b6050e03e215ca26201ced47157f6025f6e876b3" )
-                                                                                                    ] ;
-                                                                                            script = self + "/scripts/foobar.sh" ;
-                                                                                            tests = null ;
-                                                                                        } ;
+                                                                            shell-scripts =
+                                                                                {
+                                                                                    foobar =
+                                                                                        { shell-script , ... } :
+                                                                                            shell-script
+                                                                                                {
+                                                                                                    environment =
+                                                                                                        { string , ... } :
+                                                                                                            [
+                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                                                ( string "MESSAGE" "5875755ac3b432182a8817350e1994539d0b5c3ef238169ee7923dc498eea2a6cb9cbe242c7763f88e3c5e59b6050e03e215ca26201ced47157f6025f6e876b3" )
+                                                                                                            ] ;
+                                                                                                    script = self + "/scripts/foobar.sh" ;
+                                                                                                    tests = null ;
+                                                                                                } ;
+                                                                                } ;
                                                                         } ;
-                                                                } ;
-                                                        in
-                                                            ''
-                                                                ${ pkgs.coreutils }/bin/touch $out &&
-                                                                    ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.foobar } &&
-                                                                    exit 44
-                                                            '' ;
-                                                name = "foobar" ;
-                                                src = ./. ;
-                                            } ;
+                                                                in
+                                                                    ''
+                                                                        ${ pkgs.coreutils }/bin/touch $out &&
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.foobar } &&
+                                                                            exit 44
+                                                                    '' ;
+                                                        name = "foobar" ;
+                                                        src = ./. ;
+                                                    } ;
+                                        } ;
                                     lib = lib ;
                                 } ;
                 in flake-utils.lib.eachDefaultSystem fun ;
