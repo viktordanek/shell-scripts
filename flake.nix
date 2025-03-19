@@ -69,15 +69,7 @@
                                                                                     ] ;
                                                                     }
                                                                     primary ;
-                                                            root =
-                                                                builtins.concatLists
-                                                                    [
-                                                                        [
-                                                                            "${ pkgs.coreutils }/bin/mkdir $out"
-                                                                        ]
-                                                                        constructors
-                                                                    ] ;
-                                                            in builtins.concatStringsSep " &&\n\t" root ;
+                                                            in builtins.concatStringsSep " &&\n\t" constructors ;
                                                     name = "shell-scripts" ;
                                                     src = ./. ;
                                                 } ;
