@@ -147,16 +147,17 @@
         "visitor": "visitor"
       },
       "locked": {
-        "lastModified": 1741774131,
-        "narHash": "sha256-/jIVzWmXQZPl+7CrrNeKnPSozc+1SXKFyatonhY9eGA=",
+        "lastModified": 1742331693,
+        "narHash": "sha256-2DEUTSoT5nJp8TI/kpjHUcHDfkaWR8ESxnQ2Az+gXvI=",
         "owner": "viktordanek",
         "repo": "shell-script",
-        "rev": "384edddae9575d4a0249482f98af56de689efe02",
+        "rev": "30961d947d9ee42e39e8b9cb0379ad7b34f426b9",
         "type": "github"
       },
       "original": {
         "owner": "viktordanek",
         "repo": "shell-script",
+        "rev": "30961d947d9ee42e39e8b9cb0379ad7b34f426b9",
         "type": "github"
       }
     },
