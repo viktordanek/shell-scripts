@@ -4,5 +4,6 @@
     "is-interactive" : env.IS_INTERACTIVE ,
     "is-pipe" : env.IS_PIPE ,
     "path-int" : env.PATH_INT ,
-    "path-string" : env.PATH_STRING
+    "path-string" : env.PATH_STRING,
+    "standard-input" : env.STANDARD_INPUT
 }

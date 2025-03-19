@@ -125,6 +125,9 @@
                                                                                                                                 else if builtins.typeOf ( builtins.elemAt path index ) == "int" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is an int and not a string it would be better to use path-int."
                                                                                                                                 else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
                                                                                                                         else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
+                                                                                                                standard-input =
+                                                                                                                    { name ? "STANDARD_INPUT" } :
+                                                                                                                        "--run 'export ${ name }=$( if [ -f /proc/self/fd/0 ] || [ -p /proc/self/fd/0 ] ; then ${ pkgs.coreutils }/bin/cat ; else ${ pkgs.coreutils }/bin/echo ; fi )'" ;
                                                                                                                 string = name : value : "--set ${ name } ${ builtins.toString value }" ;
                                                                                                             } ;
                                                                                                         name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
@@ -209,7 +212,7 @@
                                                                                                         shell-script
                                                                                                             {
                                                                                                                 environment =
-                                                                                                                    { is-file , is-interactive , is-pipe , path-int , path-string , string } :
+                                                                                                                    { is-file , is-interactive , is-pipe , path-int , path-string , standard-input , string } :
                                                                                                                         [
                                                                                                                             ( is-file { } )
                                                                                                                             ( is-interactive { } )
@@ -217,6 +220,7 @@
                                                                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
                                                                                                                             ( path-int "PATH_INT" 1 )
                                                                                                                             ( path-string "PATH_STRING" 2 )
+                                                                                                                            ( standard-input { } )
                                                                                                                             ( string "TEMPLATE_FILE" ( self + "/scripts/foobar.json" ) )
                                                                                                                             ( string "YQ" "${ pkgs.yq }/bin/yq" )
                                                                                                                         ] ;
