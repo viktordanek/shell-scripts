@@ -1,0 +1,8 @@
+{
+    "arguments" : env.ARGUMENTS ,
+    "is-file" : env.IS_FILE ,
+    "is-interactive" : env.IS_INTERACTIVE ,
+    "is-pipe" : env.IS_PIPE ,
+    "path-int" : env.PATH_INT ,
+    "path-string" : env.PATH_STRING
+}
