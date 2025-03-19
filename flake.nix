@@ -192,27 +192,34 @@
                                                                         {
                                                                             shell-scripts =
                                                                                 {
-                                                                                    foobar =
-                                                                                        { shell-script , ... } :
-                                                                                            shell-script
-                                                                                                {
-                                                                                                    environment =
-                                                                                                        { string , ... } :
-                                                                                                            [
-                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
-                                                                                                                ( string "MESSAGE" "5875755ac3b432182a8817350e1994539d0b5c3ef238169ee7923dc498eea2a6cb9cbe242c7763f88e3c5e59b6050e03e215ca26201ced47157f6025f6e876b3" )
-                                                                                                            ] ;
-                                                                                                    script = self + "/scripts/foobar.sh" ;
-                                                                                                    tests =
-                                                                                                        {
-                                                                                                        } ;
-                                                                                                } ;
+                                                                                    foo =
+                                                                                        [
+                                                                                            {
+                                                                                                bar =
+                                                                                                    { shell-script , ... } :
+                                                                                                        shell-script
+                                                                                                            {
+                                                                                                                environment =
+                                                                                                                    { pathInteger , pathString , string } :
+                                                                                                                        [
+                                                                                                                            ( pathInteger "ALPHA" 1 )
+                                                                                                                            ( pathString "BETA" 2 )
+                                                                                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                                                            ( string "MESSAGE" "5875755ac3b432182a8817350e1994539d0b5c3ef238169ee7923dc498eea2a6cb9cbe242c7763f88e3c5e59b6050e03e215ca26201ced47157f6025f6e876b3" )
+                                                                                                                        ] ;
+                                                                                                                script = self + "/scripts/foobar.sh" ;
+                                                                                                                tests =
+                                                                                                                    {
+                                                                                                                    } ;
+                                                                                                            } ;
+                                                                                            }
+                                                                                        ] ;
                                                                                 } ;
                                                                         } ;
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.foobar } &&
+                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt 0 ( shell-scripts.shell-scripts.foo ) ) } &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } &&
                                                                             exit 44
                                                                     '' ;
