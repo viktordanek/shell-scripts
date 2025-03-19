@@ -20,6 +20,14 @@
                                     shell-scripts ? null ,
                                 } :
                                     let
+                                        _shell-scripts =
+                                            _visitor
+                                                {
+                                                    lambda = path : value : "" ;
+                                                }
+                                                {
+                                                }
+                                                primary ;
                                         derivation =
                                             pkgs.stdenv.mkDerivation
                                                 {
@@ -117,17 +125,9 @@
                                                 }
                                                 { }
                                                 shell-scripts ;
-                                        shell-scripts =
-                                            _visitor
-                                                {
-                                                    lambda = path : value : "" ;
-                                                }
-                                                {
-                                                }
-                                                primary ;
                                 in
                                     {
-                                        shell-scripts = shell-scripts ;
+                                        shell-scripts = _shell-scripts ;
                                         tests =
                                             pkgs.stdenv.mkDerivation
                                                 {
