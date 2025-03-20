@@ -218,6 +218,11 @@
                                                                                                                 script = self + "/scripts/foobar.sh" ;
                                                                                                                 tests =
                                                                                                                     {
+                                                                                                                        main =
+                                                                                                                            ignore :
+                                                                                                                                {
+                                                                                                                                    standard-output = self + "/expected/standard-output" ;
+                                                                                                                                } ;
                                                                                                                     } ;
                                                                                                             } ;
                                                                                             }
