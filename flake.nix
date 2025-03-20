@@ -210,7 +210,7 @@
                                                                                                                     { originator-pid , path-int , path-string , standard-input , shell-scripts , string } :
                                                                                                                         [
                                                                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
-                                                                                                                            ( shell-scripts "FOO" ( shell-scripts : builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.foo ) 0 ) ) )
+                                                                                                                            # ( shell-scripts "FOO" ( shell-scripts : builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.foo ) 0 ) ) )
                                                                                                                             ( originator-pid { } )
                                                                                                                             ( path-int "PATH_INT" 1 )
                                                                                                                             ( path-string "PATH_STRING" 2 )
