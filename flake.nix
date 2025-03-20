@@ -10,7 +10,7 @@
                 } ;
             string.url = "github:viktordanek/string/139557a8e70542b3eec4d729791e7e6283c220e8" ;
             standard-input.url = "github:viktordanek/standard-input/377e010bb1dd5becc27fb31d1180b8781afbcb4f" ;
-            temporary.url = "github:viktordanek/temporary/e1f37a3a4fb63f16994b4415108df04fee6dec6b" ;
+            temporary.url = "github:viktordanek/temporary/6b0e6926e0906d2b59b4733841a435f1e973685c" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
@@ -92,7 +92,6 @@
                                                                             (
                                                                                 _shell-script
                                                                                     {
-                                                                                        at = pkgs.writeShellScript "at" "$( ${ pkgs.coreutils }/bin/tee ) &" ;
                                                                                         environment = environment ;
                                                                                         extensions =
                                                                                             {
@@ -150,6 +149,7 @@
                                                             } :
                                                                 builtins.getAttr system temporary.lib
                                                                     {
+                                                                        at = pkgs.writeShellScript "at" "$( ${ pkgs.coreutils }/bin/tee ) &" ;
                                                                         init =
                                                                              if builtins.typeOf init == "lambda" then init shell-scripts
                                                                              else if builtins.typeOf init == "null" then init
