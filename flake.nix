@@ -189,7 +189,7 @@
                                                                                     ] ;
                                                                     }
                                                                     primary ;
-                                                            in builtins.concatStringsSep " &&\n\t" constructors ;
+                                                            in builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "${ pkgs.coreutils }/bin/echo $out" ] constructors ] ) ;
                                                     name = "tests" ;
                                                     src = ./. ;
                                                 } ;
