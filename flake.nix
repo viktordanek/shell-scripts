@@ -97,7 +97,7 @@
                                                                                                         environment = environment ;
                                                                                                         extensions =
                                                                                                             {
-                                                                                                                originator-pid = { name ? "ORIGINATOR_PID" } : "--set ORIGINATOR_PID WRONG" ; # builtins.getAttr system originator-pid.lib ;
+                                                                                                                originator-pid = builtins.getAttr system originator-pid.lib ;
                                                                                                                 path-int =
                                                                                                                     name : index :
                                                                                                                         if builtins.typeOf index == "int" then
@@ -233,7 +233,6 @@
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } &&
                                                                             exit 44
                                                                     '' ;
                                                         name = "foobar" ;
