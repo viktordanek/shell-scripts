@@ -3,6 +3,7 @@
         {
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
+            originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
             shell-script =
                 {
                     url = "github:viktordanek/shell-script/30961d947d9ee42e39e8b9cb0379ad7b34f426b9" ;
@@ -10,7 +11,7 @@
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
-        { flake-utils , nixpkgs , self , shell-script , visitor } :
+        { flake-utils , nixpkgs , originator-pid , self , shell-script , visitor } :
             let
                 fun =
                     system :
@@ -96,18 +97,7 @@
                                                                                                         environment = environment ;
                                                                                                         extensions =
                                                                                                             {
-                                                                                                                is-interactive =
-                                                                                                                    { name ? "IS_INTERACTIVE" } :
-                                                                                                                        "--run 'export ${ name }=$( if [ -t 0 ] ; then ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/true ; else ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/false ; fi )'" ;
-                                                                                                                is-pipe =
-                                                                                                                    { name ? "IS_PIPE" } :
-                                                                                                                        "--run 'export ${ name }=$( if [ -p /proc/self/fd/0 ] ; then ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/true ; else ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/false ; fi )'" ;
-                                                                                                                is-file =
-                                                                                                                    { name ? "IS_FILE" } :
-                                                                                                                        "--run 'export ${ name }=$( if [ -f /proc/self/fd/0 ] ; then ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/true ; else ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/false ; fi )'" ;
-                                                                                                                originator-pid =
-                                                                                                                    { name ? "ORIGINATOR_PID" } :
-                                                                                                                        "--run 'export ${ name }=$( if [ -t 0 ] ; then ${ pkgs.procps }/bin/ps -p ${ builtins.concatStringsSep "" [ "$" "{" "$" "}" ] } -o ppid= | ${ pkgs.findutils }/bin/xargs ; elif [ -p /proc/self/fd/0 ] ; then ${ pkgs.procps }/bin/ps -p $( ${ pkgs.procps }/bin/ps -p ${ builtins.concatStringsSep "" [ "$" "{" "$" "}" ] } -o ppid= ) -o ppid= | ${ pkgs.findutils }/bin/xargs ; elif [ -f /proc/self/fd/0 ] ; then ${ pkgs.procps }/bin/ps -p $( ${ pkgs.procps }/bin/ps -p ${ builtins.concatStringsSep "" [ "$" "{" "$" "}" ] } -o ppid= ) -o ppid= | ${ pkgs.findutils }/bin/xargs ; else ${ pkgs.procps }/bin/ps -p ${ builtins.concatStringsSep "" [ "$" "{" "$" "}" ] } -o ppid= | ${ pkgs.findutils }/bin/xargs ; fi ; )'" ;
+                                                                                                                originator-pid = builtins.getAttr system originator-pid.lib ;
                                                                                                                 path-int =
                                                                                                                     name : index :
                                                                                                                         if builtins.typeOf index == "int" then
@@ -215,11 +205,8 @@
                                                                                                         shell-script
                                                                                                             {
                                                                                                                 environment =
-                                                                                                                    { is-file , is-interactive , is-pipe , originator-pid , path-int , path-string , standard-input , string } :
+                                                                                                                    { originator-pid , path-int , path-string , standard-input , string } :
                                                                                                                         [
-                                                                                                                            ( is-file { } )
-                                                                                                                            ( is-interactive { } )
-                                                                                                                            ( is-pipe { } )
                                                                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
                                                                                                                             ( originator-pid { } )
                                                                                                                             ( path-int "PATH_INT" 1 )
