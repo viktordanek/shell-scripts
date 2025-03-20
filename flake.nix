@@ -77,64 +77,62 @@
                                                     name = "shell-scripts" ;
                                                     src = ./. ;
                                                 } ;
+                                            injection =
+                                                path : 
+                                                    {
+                                                        shell-script =
+                                                            {
+                                                                environment ? x : [ ] ,
+                                                                script ,
+                                                                tests ? null
+                                                            } : ignore :
+                                                                let
+                                                                    eval =
+                                                                        builtins.tryEval
+                                                                            (
+                                                                                _shell-script
+                                                                                    {
+                                                                                        environment = environment ;
+                                                                                        extensions =
+                                                                                            {
+                                                                                                originator-pid = builtins.getAttr system originator-pid.lib ;
+                                                                                                path-int =
+                                                                                                    name : index :
+                                                                                                        if builtins.typeOf index == "int" then
+                                                                                                            if index < 0 then builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is less than zero."
+                                                                                                            else if index >= builtins.length path then builtins.throw "The index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is greater than or equal to the length of the path ${ builtins.toString ( builtins.length path ) }."
+                                                                                                            else
+                                                                                                                if builtins.typeOf ( builtins.elemAt path index ) == "int" then "--set ${ name } ${ builtins.toString ( builtins.elemAt path index ) }"
+                                                                                                                else if builtins.typeOf ( builtins.elemAt path index ) == "string" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is a string and not an int it would be better to use path-string."
+                                                                                                                else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
+                                                                                                        else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
+                                                                                                path-string =
+                                                                                                    name : index :
+                                                                                                        if builtins.typeOf index == "int" then
+                                                                                                            if index < 0 then builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is less than zero."
+                                                                                                            else if index >= builtins.length path then builtins.throw "The index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is greater than or equal to the length of the path ${ builtins.toString ( builtins.length path ) }."
+                                                                                                            else
+                                                                                                                if builtins.typeOf ( builtins.elemAt path index ) == "string" then "--set ${ name } ${ builtins.elemAt path index }"
+                                                                                                                else if builtins.typeOf ( builtins.elemAt path index ) == "int" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is an int and not a string it would be better to use path-int."
+                                                                                                                else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
+                                                                                                        else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
+                                                                                                shell-scripts = name : fun : "--set ${ name } ${ builtins.trace "${ builtins.typeOf ( fun _shell-scripts ) }" ( fun shell-scripts ) }" ;
+                                                                                                standard-input = builtins.getAttr system standard-input.lib ;
+                                                                                                string = builtins.getAttr system string.lib ;
+                                                                                            } ;
+                                                                                        name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
+                                                                                        script = script ;
+                                                                                        tests = tests ;
+                                                                                    }
+                                                                            ) ;
+                                                                    in
+                                                                        if eval.success then eval.value
+                                                                        else builtins.throw "There was a problem evaluating the shell-script defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
+                                                    } ;
                                         primary =
                                             _visitor
                                                 {
-                                                    lambda =
-                                                        path : value :
-                                                            let
-                                                                injection =
-                                                                    {
-                                                                        shell-script =
-                                                                            {
-                                                                                environment ? x : [ ] ,
-                                                                                script ,
-                                                                                tests ? null
-                                                                            } : ignore :
-                                                                                let
-                                                                                    eval =
-                                                                                        builtins.tryEval
-                                                                                            (
-                                                                                                _shell-script
-                                                                                                    {
-                                                                                                        environment = environment ;
-                                                                                                        extensions =
-                                                                                                            {
-                                                                                                                originator-pid = builtins.getAttr system originator-pid.lib ;
-                                                                                                                path-int =
-                                                                                                                    name : index :
-                                                                                                                        if builtins.typeOf index == "int" then
-                                                                                                                            if index < 0 then builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is less than zero."
-                                                                                                                            else if index >= builtins.length path then builtins.throw "The index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is greater than or equal to the length of the path ${ builtins.toString ( builtins.length path ) }."
-                                                                                                                            else
-                                                                                                                                if builtins.typeOf ( builtins.elemAt path index ) == "int" then "--set ${ name } ${ builtins.toString ( builtins.elemAt path index ) }"
-                                                                                                                                else if builtins.typeOf ( builtins.elemAt path index ) == "string" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is a string and not an int it would be better to use path-string."
-                                                                                                                                else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
-                                                                                                                        else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
-                                                                                                                path-string =
-                                                                                                                    name : index :
-                                                                                                                        if builtins.typeOf index == "int" then
-                                                                                                                            if index < 0 then builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is less than zero."
-                                                                                                                            else if index >= builtins.length path then builtins.throw "The index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is greater than or equal to the length of the path ${ builtins.toString ( builtins.length path ) }."
-                                                                                                                            else
-                                                                                                                                if builtins.typeOf ( builtins.elemAt path index ) == "string" then "--set ${ name } ${ builtins.elemAt path index }"
-                                                                                                                                else if builtins.typeOf ( builtins.elemAt path index ) == "int" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is an int and not a string it would be better to use path-int."
-                                                                                                                                else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
-                                                                                                                        else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
-                                                                                                                shell-scripts = name : fun : "--set ${ name } ${ builtins.trace "${ builtins.typeOf ( fun _shell-scripts ) }" ( fun shell-scripts ) }" ;
-                                                                                                                standard-input = builtins.getAttr system standard-input.lib ;
-                                                                                                                string = builtins.getAttr system string.lib ;
-                                                                                                            } ;
-                                                                                                        name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
-                                                                                                        script = script ;
-                                                                                                        tests = tests ;
-                                                                                                    }
-                                                                                            ) ;
-                                                                                    in
-                                                                                        if eval.success then eval.value
-                                                                                        else builtins.throw "There was a problem evaluating the shell-script defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
-                                                                    } ;
-                                                                in value injection ;
+                                                    lambda = path : value : value ( injection path ) ;
                                                 }
                                                 { }
                                                 shell-scripts ;
