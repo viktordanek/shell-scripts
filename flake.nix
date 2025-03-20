@@ -150,12 +150,10 @@
                                                                         lambda =
                                                                             path : value :
                                                                                 let
-                                                                                    eval = builtins.tryEval primary.tests ;
                                                                                     primary = value null ;
                                                                                     in
                                                                                         [
-                                                                                           # "${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.coreutils }/bin/${ if eval.success then "true" else "false" } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                           "${ pkgs.coreutils }/bin/ln --symbolic ${ builtins.trace ( builtins.toString eval.value ) eval.value } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                           "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests} ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ] ;
                                                                     }
                                                                     {
@@ -235,7 +233,7 @@
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } 
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests }
                                                                     '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;
