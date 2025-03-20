@@ -6,7 +6,7 @@
             originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
             shell-script =
                 {
-                    url = "github:viktordanek/shell-script/30961d947d9ee42e39e8b9cb0379ad7b34f426b9" ;
+                    url = "github:viktordanek/shell-script/5f8d4b0aa400694253c0dbb35fbb508b91b34e73" ;
                 } ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
@@ -150,10 +150,12 @@
                                                                         lambda =
                                                                             path : value :
                                                                                 let
+                                                                                    eval = builtins.tryEval primary.tests ;
                                                                                     primary = value null ;
                                                                                     in
                                                                                         [
-                                                                                            "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                           # "${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.coreutils }/bin/${ if eval.success then "true" else "false" } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                           "${ pkgs.coreutils }/bin/ln --symbolic ${ builtins.trace ( builtins.toString eval.value ) eval.value } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ] ;
                                                                     }
                                                                     {
@@ -233,6 +235,7 @@
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) } &&
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } &&
                                                                             exit 44
                                                                     '' ;
                                                         name = "foobar" ;
