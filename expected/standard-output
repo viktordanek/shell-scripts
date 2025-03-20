@@ -1,5 +1,6 @@
 arguments: ''
-originator-pid: '68'
+foobar: /nix/store/nf95cqqkffpla09rmf3413qmnpizayan-shell-scripts/foo/0/bar
+originator-pid: '73'
 path-int: '0'
 path-string: bar
 standard-input: ''
