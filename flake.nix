@@ -119,14 +119,6 @@
                                                                                                 shell-scripts =
                                                                                                     name : fun :
                                                                                                         let
-                                                                                                            shell-scripts =
-                                                                                                                _visitor
-                                                                                                                    {
-                                                                                                                        lambda = path : value : builtins.concatStringsSep "/" ( builtins.concatLists [ [ derivation ] ( builtins.map builtins.toJSON path ) ] ) ;
-                                                                                                                    }
-                                                                                                                    {
-                                                                                                                    }
-                                                                                                                    primary ;
                                                                                                             in
                                                                                                                 "--set ${ name } ${ fun shell-scripts }" ;
                                                                                                 standard-input = builtins.getAttr system standard-input.lib ;
@@ -137,9 +129,40 @@
                                                                                         tests = tests ;
                                                                                     }
                                                                             ) ;
+                                                                        shell-scripts =
+                                                                            _visitor
+                                                                                {
+                                                                                    lambda = path : value : builtins.concatStringsSep "/" ( builtins.concatLists [ [ derivation ] ( builtins.map builtins.toJSON path ) ] ) ;
+                                                                                }
+                                                                                {
+                                                                                }
+                                                                                primary ;
                                                                     in
                                                                         if eval.success then eval.value
                                                                         else builtins.throw "There was a problem evaluating the shell-script defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
+                                                        temporary =
+                                                            {
+                                                                init ? null ,
+                                                                release ? null ,
+                                                                post ? null ,
+                                                                tests ? null
+                                                            } :
+                                                                builtins.getAttr system temporary.lib
+                                                                    {
+                                                                        init =
+                                                                             if builtins.typeOf init == "lambda" then init shell-scripts
+                                                                             else if builtins.typeOf init == "null" then init
+                                                                             else builtins.throw "The init for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf init }." ;
+                                                                       post =
+                                                                            if builtins.typeOf post == "lambda" then post shell-scripts
+                                                                            else if builtins.typeOf post == "null" then post
+                                                                            else builtins.throw "The post for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf post }." ;
+                                                                       release =
+                                                                            if builtins.typeOf init == "lambda" then release shell-scripts
+                                                                            else if builtins.typeOf release == "null" then release
+                                                                            else builtins.throw "The release for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf release }." ;
+                                                                        tests = tests ;
+                                                                    } ;
                                                     } ;
                                         primary =
                                             _visitor
@@ -165,7 +188,7 @@
                                                                                     primary = value ( injection path derivation ) ;
                                                                                     in
                                                                                         [
-                                                                                           "${ pkgs.diffutils }/bin/diff --recursive ${ primary.tests }/expected ${ primary.tests }/observed > ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                           "if ! ${ pkgs.diffutils }/bin/diff --recursive ${ primary.tests }/expected ${ primary.tests }/observed ; then ${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) } ; fi"
                                                                                         ] ;
                                                                     }
                                                                     {
@@ -246,8 +269,7 @@
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } &&
-                                                                            exit 64
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests }
                                                                     '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;
