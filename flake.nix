@@ -97,7 +97,7 @@
                                                                                                         environment = environment ;
                                                                                                         extensions =
                                                                                                             {
-                                                                                                                originator-pid = builtins.getAttr system originator-pid.lib ;
+                                                                                                                originator-pid = { name ? "ORIGINATOR_PID" } : "--set ORIGINATOR_PID WRONG" ; # builtins.getAttr system originator-pid.lib ;
                                                                                                                 path-int =
                                                                                                                     name : index :
                                                                                                                         if builtins.typeOf index == "int" then
@@ -221,14 +221,7 @@
                                                                                                                         main =
                                                                                                                             ignore :
                                                                                                                                 {
-                                                                                                                                    mounts =
-                                                                                                                                        {
-                                                                                                                                            singleton =
-                                                                                                                                                {
-                                                                                                                                                    expected = self + "/expected/singleton/expected" ;
-                                                                                                                                                    initial = self + "/expected/singleton/initial" ;
-                                                                                                                                                } ;
-                                                                                                                                        } ;
+                                                                                                                                    standard-output = builtins.readFile ( self + "/expected/standard-output" ) ;
                                                                                                                                 } ;
                                                                                                                     } ;
                                                                                                             } ;
