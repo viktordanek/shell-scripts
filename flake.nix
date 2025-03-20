@@ -165,7 +165,7 @@
                                                                                     primary = value ( injection path derivation ) ;
                                                                                     in
                                                                                         [
-                                                                                           "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests} ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                           "${ pkgs.diffutils }/bin/diff --recursive ${ primary.tests }/expected ${ primary.tests }/observed > ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ] ;
                                                                     }
                                                                     {
