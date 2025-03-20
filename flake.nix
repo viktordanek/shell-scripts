@@ -8,10 +8,11 @@
                 {
                     url = "github:viktordanek/shell-script/4974ddc86591c9eb7c4c428b988e3beb016c3b53" ;
                 } ;
+            string.url = "github:viktordanek/string/139557a8e70542b3eec4d729791e7e6283c220e8" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
-        { flake-utils , nixpkgs , originator-pid , self , shell-script , visitor } :
+        { flake-utils , nixpkgs , originator-pid , self , shell-script , string , visitor } :
             let
                 fun =
                     system :
@@ -121,7 +122,7 @@
                                                                                                                 standard-input =
                                                                                                                     { name ? "STANDARD_INPUT" } :
                                                                                                                         "--run 'export ${ name }=$( if [ -f /proc/self/fd/0 ] || [ -p /proc/self/fd/0 ] ; then ${ pkgs.coreutils }/bin/cat ; else ${ pkgs.coreutils }/bin/echo ; fi )'" ;
-                                                                                                                string = name : value : "--set ${ name } ${ builtins.toString value }" ;
+                                                                                                                string = builtins.getAttr system string.lib ;
                                                                                                             } ;
                                                                                                         name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
                                                                                                         script = script ;
