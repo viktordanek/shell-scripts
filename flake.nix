@@ -9,10 +9,11 @@
                     url = "github:viktordanek/shell-script/4974ddc86591c9eb7c4c428b988e3beb016c3b53" ;
                 } ;
             string.url = "github:viktordanek/string/139557a8e70542b3eec4d729791e7e6283c220e8" ;
+            standard-input.url = "github:viktordanek/standard-input/377e010bb1dd5becc27fb31d1180b8781afbcb4f" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
-        { flake-utils , nixpkgs , originator-pid , self , shell-script , string , visitor } :
+        { flake-utils , nixpkgs , originator-pid , self , shell-script , standard-input , string , visitor } :
             let
                 fun =
                     system :
@@ -119,9 +120,7 @@
                                                                                                                                 else if builtins.typeOf ( builtins.elemAt path index ) == "int" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is an int and not a string it would be better to use path-int."
                                                                                                                                 else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
                                                                                                                         else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
-                                                                                                                standard-input =
-                                                                                                                    { name ? "STANDARD_INPUT" } :
-                                                                                                                        "--run 'export ${ name }=$( if [ -f /proc/self/fd/0 ] || [ -p /proc/self/fd/0 ] ; then ${ pkgs.coreutils }/bin/cat ; else ${ pkgs.coreutils }/bin/echo ; fi )'" ;
+                                                                                                                standard-input = builtins.getAttr system standard-input.lib ;
                                                                                                                 string = builtins.getAttr system string.lib ;
                                                                                                             } ;
                                                                                                         name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
@@ -236,8 +235,7 @@
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } &&
-                                                                            exit 44
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } 
                                                                     '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;
