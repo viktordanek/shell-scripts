@@ -116,7 +116,11 @@
                                                                                                                 else if builtins.typeOf ( builtins.elemAt path index ) == "int" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is an int and not a string it would be better to use path-int."
                                                                                                                 else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
                                                                                                         else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
-                                                                                                shell-scripts = name : fun : "--set ${ name } ${ fun _shell-scripts }" ;
+                                                                                                shell-scripts =
+                                                                                                    name : fun :
+                                                                                                        let
+                                                                                                            in
+                                                                                                                "--set ${ name } WRONG" ;
                                                                                                 standard-input = builtins.getAttr system standard-input.lib ;
                                                                                                 string = builtins.getAttr system string.lib ;
                                                                                             } ;
