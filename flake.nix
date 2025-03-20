@@ -221,7 +221,13 @@
                                                                                                                         main =
                                                                                                                             ignore :
                                                                                                                                 {
-                                                                                                                                    standard-output = self + "/expected/standard-output" ;
+                                                                                                                                    mounts =
+                                                                                                                                        {
+                                                                                                                                            singleton =
+                                                                                                                                                {
+                                                                                                                                                    expected = self + "/expected/singleton/expected" ;
+                                                                                                                                                } ;
+                                                                                                                                        } ;
                                                                                                                                 } ;
                                                                                                                     } ;
                                                                                                             } ;
