@@ -241,6 +241,17 @@
                                                                         {
                                                                             shell-scripts =
                                                                                 {
+                                                                                    file =
+                                                                                        { shell-script , ... } :
+                                                                                            shell-script
+                                                                                                {
+                                                                                                    environment =
+                                                                                                        { string , ... } :
+                                                                                                            [
+                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                                            ] ;
+                                                                                                    script = self + "/scripts/file.sh" ;
+                                                                                                } ;
                                                                                     foo =
                                                                                         [
                                                                                             {
@@ -272,18 +283,13 @@
                                                                                                             } ;
                                                                                             }
                                                                                         ] ;
-                                                                                    temporary =
-                                                                                        { temporary , ... } :
-                                                                                            temporary
-                                                                                                {
-                                                                                                } ;
                                                                                 } ;
                                                                         } ;
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests }
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.file } &&
+                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) }
                                                                     '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;

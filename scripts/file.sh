@@ -1,1 +1,1 @@
-${ECHO} hi ${TARGET}
+${ECHO}
