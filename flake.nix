@@ -241,7 +241,18 @@
                                                                         {
                                                                             shell-scripts =
                                                                                 {
-                                                                                    file =
+                                                                                    file1 =
+                                                                                        { shell-script , ... } :
+                                                                                            shell-script
+                                                                                                {
+                                                                                                    environment =
+                                                                                                        { string , ... } :
+                                                                                                            [
+                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                                            ] ;
+                                                                                                    script = self + "/scripts/file.sh" ;
+                                                                                                } ;
+                                                                                    file2 =
                                                                                         { shell-script , ... } :
                                                                                             shell-script
                                                                                                 {
@@ -288,7 +299,7 @@
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.file } &&
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.file1 } &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) }
                                                                     '' ;
                                                         name = "foobar" ;
