@@ -46,7 +46,7 @@
                                                                         lambda =
                                                                             path : value :
                                                                                 let
-                                                                                    primary = value ( injection path ) ;
+                                                                                    primary = value ( injection path "$out" ) ;
                                                                                     in
                                                                                         [
                                                                                             "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.shell-script } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
@@ -78,7 +78,7 @@
                                                     src = ./. ;
                                                 } ;
                                             injection =
-                                                path : 
+                                                path : derivation :
                                                     {
                                                         shell-script =
                                                             {
@@ -119,8 +119,16 @@
                                                                                                 shell-scripts =
                                                                                                     name : fun :
                                                                                                         let
+                                                                                                            shell-scripts =
+                                                                                                                _visitor
+                                                                                                                    {
+                                                                                                                        lambda = path : value : builtins.concatStringsSep "/" ( builtins.concatLists [ [ derivation ] ( builtins.map builtins.toJSON path ) ] ) ;
+                                                                                                                    }
+                                                                                                                    {
+                                                                                                                    }
+                                                                                                                    primary ;
                                                                                                             in
-                                                                                                                "--set ${ name } WRONG" ;
+                                                                                                                "--set ${ name } ${ fun shell-scripts }" ;
                                                                                                 standard-input = builtins.getAttr system standard-input.lib ;
                                                                                                 string = builtins.getAttr system string.lib ;
                                                                                             } ;
@@ -154,7 +162,7 @@
                                                                         lambda =
                                                                             path : value :
                                                                                 let
-                                                                                    primary = value ( injection path ) ;
+                                                                                    primary = value ( injection path derivation ) ;
                                                                                     in
                                                                                         [
                                                                                            "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests} ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
