@@ -46,7 +46,7 @@
                                                                         lambda =
                                                                             path : value :
                                                                                 let
-                                                                                    primary = value "$out" ;
+                                                                                    primary = value ( injection path ) ;
                                                                                     in
                                                                                         [
                                                                                             "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.shell-script } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
@@ -85,7 +85,7 @@
                                                                 environment ? x : [ ] ,
                                                                 script ,
                                                                 tests ? null
-                                                            } : ignore :
+                                                            } :
                                                                 let
                                                                     eval =
                                                                         builtins.tryEval
@@ -132,7 +132,7 @@
                                         primary =
                                             _visitor
                                                 {
-                                                    lambda = path : value : value ( injection path ) ;
+                                                    lambda = path : value : value ;
                                                 }
                                                 { }
                                                 shell-scripts ;
@@ -150,7 +150,7 @@
                                                                         lambda =
                                                                             path : value :
                                                                                 let
-                                                                                    primary = value null ;
+                                                                                    primary = value ( injection path ) ;
                                                                                     in
                                                                                         [
                                                                                            "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests} ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
