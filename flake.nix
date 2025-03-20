@@ -105,6 +105,9 @@
                                                                                                                 is-file =
                                                                                                                     { name ? "IS_FILE" } :
                                                                                                                         "--run 'export ${ name }=$( if [ -f /proc/self/fd/0 ] ; then ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/true ; else ${ pkgs.coreutils }/bin/echo ${ pkgs.coreutils }/bin/false ; fi )'" ;
+                                                                                                                originator-pid =
+                                                                                                                    { name ? "ORIGINATOR_PID" } :
+                                                                                                                        "--run 'export ${ name }=$( if [ -t 0 ] ; then ${ pkgs.procps }/bin/ps -p ${ builtins.concatStringsSep "" [ "$" "{" "$" "}" ] } -o ppid= ; elif [ -p /proc/self/fd/0 ] ; then ${ pkgs.procps }/bin/ps -p $( ${ pkgs.procps }/bin/ps -p ${ builtins.concatStringsSep "" [ "$" "{" "$" "}" ] } -o ppid= ) -o ppid= ; elif [ -f /proc/self/fd/0 ] ; then ${ pkgs.procps }/bin/ps -p $( ${ pkgs.procps }/bin/ps -p ${ builtins.concatStringsSep "" [ "$" "{" "$" "}" ] } -o ppid= ) -o ppid= ; else ${ pkgs.procps }/bin/ps -p ${ builtins.concatStringsSep "" [ "$" "{" "$" "}" ] } -o ppid= ; fi ; )'" ;
                                                                                                                 path-int =
                                                                                                                     name : index :
                                                                                                                         if builtins.typeOf index == "int" then
@@ -212,12 +215,13 @@
                                                                                                         shell-script
                                                                                                             {
                                                                                                                 environment =
-                                                                                                                    { is-file , is-interactive , is-pipe , path-int , path-string , standard-input , string } :
+                                                                                                                    { is-file , is-interactive , is-pipe , originator-pid , path-int , path-string , standard-input , string } :
                                                                                                                         [
                                                                                                                             ( is-file { } )
                                                                                                                             ( is-interactive { } )
                                                                                                                             ( is-pipe { } )
                                                                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
+                                                                                                                            ( originator-pid { } )
                                                                                                                             ( path-int "PATH_INT" 1 )
                                                                                                                             ( path-string "PATH_STRING" 2 )
                                                                                                                             ( standard-input { } )

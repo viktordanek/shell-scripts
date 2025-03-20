@@ -3,6 +3,7 @@
     "is-file" : env.IS_FILE ,
     "is-interactive" : env.IS_INTERACTIVE ,
     "is-pipe" : env.IS_PIPE ,
+    "originator-pid" : env.ORIGINATOR_PID ,
     "path-int" : env.PATH_INT ,
     "path-string" : env.PATH_STRING,
     "standard-input" : env.STANDARD_INPUT
