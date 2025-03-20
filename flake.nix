@@ -92,6 +92,7 @@
                                                                             (
                                                                                 _shell-script
                                                                                     {
+                                                                                        at = pkgs.writeShellScript "at" "$( ${ pkgs.coreutils }/bin/tee ) &" ;
                                                                                         environment = environment ;
                                                                                         extensions =
                                                                                             {
