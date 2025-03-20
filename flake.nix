@@ -169,7 +169,7 @@
                                                                                     }
                                                                         ) ;
                                                                 in
-                                                                    if builtins.trace eval.success then eval.value
+                                                                    if eval.success then eval.value
                                                                     else builtins.throw "There was a problem evaluating the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
                                                     } ;
                                         primary =
@@ -304,13 +304,33 @@
                                                                                                             ] ;
                                                                                                     script = self + "/scripts/init.sh" ;
                                                                                                 } ;
-
+                                                                                    noop =
+                                                                                        { shell-script , ... } :
+                                                                                            shell-script
+                                                                                                {
+                                                                                                    environment =
+                                                                                                        { string , ... } :
+                                                                                                            [
+                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                                            ] ;
+                                                                                                    script = self + "/scripts/noop.sh" ;
+                                                                                                } ;
+                                                                                    # temporary =
+                                                                                    #     { temporary , ... } :
+                                                                                    #         temporary
+                                                                                    #             {
+                                                                                    #                 init = shell-scripts : shell-scripts.init ;
+                                                                                    #                 release = shell-scripts : shell-scripts.noop ;
+                                                                                    #                 post = shell-scripts : shell-scripts.noop ;
+                                                                                    #                 tests = [ ] ;
+                                                                                    #           } ;
                                                                                 } ;
                                                                         } ;
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.init } &&
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.noop } &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) } &&
                                                                             exit 66
                                                                     '' ;
