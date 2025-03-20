@@ -121,7 +121,7 @@
                                                                                                                                 else if builtins.typeOf ( builtins.elemAt path index ) == "int" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is an int and not a string it would be better to use path-int."
                                                                                                                                 else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
                                                                                                                         else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
-                                                                                                                shell-scripts = name : fun : fun shell-scripts ;
+                                                                                                                shell-scripts = name : fun : "--set ${ name } ${ builtins.trace "${ builtins.typeOf ( fun _shell-scripts ) }" ( fun shell-scripts ) }" ;
                                                                                                                 standard-input = builtins.getAttr system standard-input.lib ;
                                                                                                                 string = builtins.getAttr system string.lib ;
                                                                                                             } ;
@@ -210,6 +210,7 @@
                                                                                                                     { originator-pid , path-int , path-string , standard-input , shell-scripts , string } :
                                                                                                                         [
                                                                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
+                                                                                                                            ( shell-scripts "FOO" ( shell-scripts : builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.foo ) 0 ) ) )
                                                                                                                             ( originator-pid { } )
                                                                                                                             ( path-int "PATH_INT" 1 )
                                                                                                                             ( path-string "PATH_STRING" 2 )
