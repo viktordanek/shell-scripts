@@ -226,6 +226,7 @@
                                                                                                                                             singleton =
                                                                                                                                                 {
                                                                                                                                                     expected = self + "/expected/singleton/expected" ;
+                                                                                                                                                    initial = self + "/expected/singleton/initial" ;
                                                                                                                                                 } ;
                                                                                                                                         } ;
                                                                                                                                 } ;
