@@ -6,7 +6,7 @@
             originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
             shell-script =
                 {
-                    url = "github:viktordanek/shell-script/5f8d4b0aa400694253c0dbb35fbb508b91b34e73" ;
+                    url = "github:viktordanek/shell-script/c4594f616f65f996b9a57347692e4026bf5b6be9" ;
                 } ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
