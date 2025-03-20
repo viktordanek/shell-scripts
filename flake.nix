@@ -220,7 +220,7 @@
                                                                                                                     { originator-pid , path-int , path-string , standard-input , shell-scripts , string } :
                                                                                                                         [
                                                                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
-                                                                                                                            ( shell-scripts "FOO" ( shell-scripts : builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.foo ) 0 ) ) )
+                                                                                                                            ( shell-scripts "FOOBAR" ( shell-scripts : builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.foo ) 0 ) ) )
                                                                                                                             ( originator-pid { } )
                                                                                                                             ( path-int "PATH_INT" 1 )
                                                                                                                             ( path-string "PATH_STRING" 2 )
@@ -246,7 +246,8 @@
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests }
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } &&
+                                                                            exit 64
                                                                     '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;
