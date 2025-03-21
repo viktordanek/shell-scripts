@@ -6,7 +6,7 @@
             originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
             shell-script =
                 {
-                    url = "github:viktordanek/shell-script/4974ddc86591c9eb7c4c428b988e3beb016c3b53" ;
+                    url = "github:viktordanek/shell-script/milestone/03212025" ;
                 } ;
             string.url = "github:viktordanek/string/139557a8e70542b3eec4d729791e7e6283c220e8" ;
             standard-input.url = "github:viktordanek/standard-input/377e010bb1dd5becc27fb31d1180b8781afbcb4f" ;
@@ -196,7 +196,8 @@
                                                                                     primary = value ( injection path derivation ) ;
                                                                                     in
                                                                                         [
-                                                                                           "if ! ${ pkgs.diffutils }/bin/diff --recursive ${ primary.tests }/expected ${ primary.tests }/observed ; then ${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) } ; fi"
+                                                                                           # "if ! ${ pkgs.diffutils }/bin/diff --recursive ${ primary.tests }/expected ${ primary.tests }/observed ; then ${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) } ; fi"
+                                                                                           "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ] ;
                                                                     }
                                                                     {
@@ -331,7 +332,7 @@
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.init } &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.noop } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) } &&
+                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) }
                                                                             exit 66
                                                                     '' ;
                                                         name = "foobar" ;
