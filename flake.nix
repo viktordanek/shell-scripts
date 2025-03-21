@@ -6,7 +6,7 @@
             originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
             shell-script.url = "github:viktordanek/shell-script/milestone/03212025" ;
             string.url = "github:viktordanek/string" ;
-            standard-input.url = "github:viktordanek/standard-input/milestone/1" ;
+            standard-input.url = "github:viktordanek/standard-input" ;
             temporary.url = "github:viktordanek/temporary/milestone/5" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
