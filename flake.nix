@@ -4,12 +4,9 @@
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
             originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
-            shell-script =
-                {
-                    url = "github:viktordanek/shell-script/milestone/03212025" ;
-                } ;
+            shell-script.url = "github:viktordanek/shell-script/milestone/03212025" ;
             string.url = "github:viktordanek/string/139557a8e70542b3eec4d729791e7e6283c220e8" ;
-            standard-input.url = "github:viktordanek/standard-input/377e010bb1dd5becc27fb31d1180b8781afbcb4f" ;
+            standard-input.url = "github:viktordanek/standard-input/milestone/1" ;
             temporary.url = "github:viktordanek/temporary/6b0e6926e0906d2b59b4733841a435f1e973685c" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;

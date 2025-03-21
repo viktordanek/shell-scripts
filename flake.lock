@@ -495,17 +495,17 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1742485087,
+        "lastModified": 1742555577,
         "narHash": "sha256-/328wuXq+7RNRef8ndlL+DFPfFbP4eN0cu4zzNCEAGc=",
         "owner": "viktordanek",
         "repo": "standard-input",
-        "rev": "377e010bb1dd5becc27fb31d1180b8781afbcb4f",
+        "rev": "19784a4e056411aac06c8a93274238d57264a988",
         "type": "github"
       },
       "original": {
         "owner": "viktordanek",
+        "ref": "milestone/1",
         "repo": "standard-input",
-        "rev": "377e010bb1dd5becc27fb31d1180b8781afbcb4f",
         "type": "github"
       }
     },
