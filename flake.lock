@@ -715,16 +715,15 @@
         "visitor": "visitor_3"
       },
       "locked": {
-        "lastModified": 1742555940,
+        "lastModified": 1742556566,
         "narHash": "sha256-w8KDIWiGvd/SlJq1XMSQpazQbmKGQR7+/8Ut8+zk0+Q=",
         "owner": "viktordanek",
         "repo": "temporary",
-        "rev": "18d3e85cfa2c26956a5b359caf20fde92a94f213",
+        "rev": "55c129c24b5f154859cef07fd586ba919c9cfd58",
         "type": "github"
       },
       "original": {
         "owner": "viktordanek",
-        "ref": "milestone/5",
         "repo": "temporary",
         "type": "github"
       }
