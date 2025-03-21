@@ -1,0 +1,8 @@
+{
+    "arguments" : env.ARGUMENTS ,
+    "foobar" : env.FOOBAR ,
+    "originator-pid" : env.ORIGINATOR_PID ,
+    "path-int" : env.PATH_INT ,
+    "path-string" : env.PATH_STRING,
+    "standard-input" : env.STANDARD_INPUT
+}
