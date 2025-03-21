@@ -5,9 +5,9 @@
             nixpkgs.url = "github:NixOs/nixpkgs" ;
             originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
             shell-script.url = "github:viktordanek/shell-script/milestone/03212025" ;
-            string.url = "github:viktordanek/string/139557a8e70542b3eec4d729791e7e6283c220e8" ;
+            string.url = "github:viktordanek/string/milestone/1" ;
             standard-input.url = "github:viktordanek/standard-input/milestone/1" ;
-            temporary.url = "github:viktordanek/temporary/scratch/97fd8f9e-3256-476b-838a-3d48ee769937" ;
+            temporary.url = "github:viktordanek/temporary/milestone/5" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
