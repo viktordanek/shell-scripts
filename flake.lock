@@ -515,17 +515,17 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "lastModified": 1742484136,
+        "lastModified": 1742556130,
         "narHash": "sha256-OrHeHiCPibomGtVvPfenTB+sAxZTE+Oy18BW7oiilNQ=",
         "owner": "viktordanek",
         "repo": "string",
-        "rev": "139557a8e70542b3eec4d729791e7e6283c220e8",
+        "rev": "2a63ed4d6b21bc0ab61c9649680ffb8c5c925690",
         "type": "github"
       },
       "original": {
         "owner": "viktordanek",
+        "ref": "milestone/1",
         "repo": "string",
-        "rev": "139557a8e70542b3eec4d729791e7e6283c220e8",
         "type": "github"
       }
     },
@@ -717,16 +717,16 @@
         "visitor": "visitor_3"
       },
       "locked": {
-        "lastModified": 1742519066,
+        "lastModified": 1742555940,
         "narHash": "sha256-w8KDIWiGvd/SlJq1XMSQpazQbmKGQR7+/8Ut8+zk0+Q=",
         "owner": "viktordanek",
         "repo": "temporary",
-        "rev": "c9a5e2ebf9d15891e88c2b62122a0a2da97c26fe",
+        "rev": "18d3e85cfa2c26956a5b359caf20fde92a94f213",
         "type": "github"
       },
       "original": {
         "owner": "viktordanek",
-        "ref": "scratch/97fd8f9e-3256-476b-838a-3d48ee769937",
+        "ref": "milestone/5",
         "repo": "temporary",
         "type": "github"
       }
