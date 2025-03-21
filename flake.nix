@@ -7,7 +7,7 @@
             shell-script.url = "github:viktordanek/shell-script/milestone/03212025" ;
             string.url = "github:viktordanek/string/139557a8e70542b3eec4d729791e7e6283c220e8" ;
             standard-input.url = "github:viktordanek/standard-input/milestone/1" ;
-            temporary.url = "github:viktordanek/temporary/6b0e6926e0906d2b59b4733841a435f1e973685c" ;
+            temporary.url = "github:viktordanek/temporary/scratch/97fd8f9e-3256-476b-838a-3d48ee769937" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =

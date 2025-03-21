@@ -717,17 +717,17 @@
         "visitor": "visitor_3"
       },
       "locked": {
-        "lastModified": 1742503027,
-        "narHash": "sha256-jNT6Q9XDgsaJwmJOYG08c+nLTnoWCHVz15EEdJ0LCqs=",
+        "lastModified": 1742519066,
+        "narHash": "sha256-w8KDIWiGvd/SlJq1XMSQpazQbmKGQR7+/8Ut8+zk0+Q=",
         "owner": "viktordanek",
         "repo": "temporary",
-        "rev": "6b0e6926e0906d2b59b4733841a435f1e973685c",
+        "rev": "c9a5e2ebf9d15891e88c2b62122a0a2da97c26fe",
         "type": "github"
       },
       "original": {
         "owner": "viktordanek",
+        "ref": "scratch/97fd8f9e-3256-476b-838a-3d48ee769937",
         "repo": "temporary",
-        "rev": "6b0e6926e0906d2b59b4733841a435f1e973685c",
         "type": "github"
       }
     },
