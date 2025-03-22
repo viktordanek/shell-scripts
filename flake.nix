@@ -7,11 +7,10 @@
             shell-script.url = "github:viktordanek/shell-script/milestone/03282025" ;
             string.url = "github:viktordanek/string/milestone/03282025" ;
             standard-input.url = "github:viktordanek/standard-input/milestone/03282025" ;
-            temporary.url = "github:viktordanek/temporary/milestone/03282025" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
-        { flake-utils , nixpkgs , originator-pid , self , shell-script , standard-input , temporary , string , visitor } :
+        { flake-utils , nixpkgs , originator-pid , self , shell-script , standard-input , string , visitor } :
             let
                 fun =
                     system :
@@ -136,39 +135,7 @@
                                                                                 primary ;
                                                                     in
                                                                         if eval.success then eval.value
-                                                                        else builtins.throw "There was a problem evaluating the shell-script defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
-                                                        temporary =
-                                                            {
-                                                                init ? null ,
-                                                                release ? null ,
-                                                                post ? null ,
-                                                                tests ? null
-                                                            } :
-                                                                let
-                                                                    eval =
-                                                                        builtins.tryEval
-                                                                            (
-                                                                                builtins.getAttr system temporary.lib
-                                                                                    {
-                                                                                        init =
-                                                                                             if builtins.typeOf init == "lambda" then init shell-scripts
-                                                                                             else if builtins.typeOf init == "null" then init
-                                                                                             else builtins.throw "The init for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf init }." ;
-                                                                                       post =
-                                                                                            if builtins.typeOf post == "lambda" then post shell-scripts
-                                                                                            else if builtins.typeOf post == "null" then post
-                                                                                            else builtins.throw "The post for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf post }." ;
-                                                                                       release =
-                                                                                            if builtins.typeOf init == "lambda" then release shell-scripts
-                                                                                            else if builtins.typeOf release == "null" then release
-                                                                                            else builtins.throw "The release for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf release }." ;
-                                                                                        tests = tests ;
-                                                                                    }
-                                                                        ) ;
-                                                                in
-                                                                    if eval.success then eval.value
-                                                                    else builtins.throw "There was a problem evaluating the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
-                                                    } ;
+                                                                        else builtins.throw "There was a problem evaluating the shell-script defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;                                                    } ;
                                         primary =
                                             _visitor
                                                 {
@@ -313,15 +280,6 @@
                                                                                                             ] ;
                                                                                                     script = self + "/scripts/noop.sh" ;
                                                                                                 } ;
-                                                                                    # temporary =
-                                                                                    #     { temporary , ... } :
-                                                                                    #         temporary
-                                                                                    #             {
-                                                                                    #                 init = shell-scripts : shell-scripts.init ;
-                                                                                    #                 release = shell-scripts : shell-scripts.noop ;
-                                                                                    #                 post = shell-scripts : shell-scripts.noop ;
-                                                                                    #                 tests = [ ] ;
-                                                                                    #           } ;
                                                                                 } ;
                                                                         } ;
                                                                 in
