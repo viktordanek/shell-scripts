@@ -287,7 +287,8 @@
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.init } &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.noop } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) }
+                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) } &&
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } &&
                                                                             exit 66
                                                                     '' ;
                                                         name = "foobar" ;
