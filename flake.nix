@@ -5,8 +5,8 @@
             nixpkgs.url = "github:NixOs/nixpkgs" ;
             originator-pid.url = "github:viktordanek/originator-pid" ;
             shell-script.url = "github:viktordanek/shell-script/milestone/03282025" ;
-            string.url = "github:viktordanek/string/milestone/03282025" ;
-            standard-input.url = "github:viktordanek/standard-input/milestone/03282025" ;
+            string.url = "github:viktordanek/string" ;
+            standard-input.url = "github:viktordanek/standard-input" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
@@ -185,7 +185,13 @@
                                                                                     ] ;
                                                                     }
                                                                     primary ;
-                                                            in builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "${ pkgs.coreutils }/bin/echo $out" ] constructors ] ) ;
+                                                            in
+                                                                ''
+                                                                    ${ pkgs.coreutils }/bin/mkdir $out &&
+                                                                        ${ pkgs.coreutils }/bin/mkdir $out/bin &&
+                                                                        ## ${ pkgs.coreutils }/bin/echo '${ builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "${ pkgs.coreutils }/bin/echo $out" ] constructors ] ) }' > $out/bin/constructors.sh
+                                                                        ${ pkgs.coreutils }/bin/chmod 0555 $out/bin/constructors.sh
+                                                                '' ;
                                                     name = "tests" ;
                                                     src = ./. ;
                                                 } ;

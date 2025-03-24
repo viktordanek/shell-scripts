@@ -350,7 +350,6 @@
       },
       "original": {
         "owner": "viktordanek",
-        "ref": "milestone/03282025",
         "repo": "standard-input",
         "type": "github"
       }
@@ -370,7 +369,6 @@
       },
       "original": {
         "owner": "viktordanek",
-        "ref": "milestone/03282025",
         "repo": "string",
         "type": "github"
       }
