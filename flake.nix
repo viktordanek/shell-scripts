@@ -160,7 +160,6 @@
                                                                                     primary = value ( injection path derivation ) ;
                                                                                     in
                                                                                         [
-                                                                                           # "if ! ${ pkgs.diffutils }/bin/diff --recursive ${ primary.tests }/expected ${ primary.tests }/observed ; then ${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) } ; fi"
                                                                                            "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ] ;
                                                                     }
@@ -188,9 +187,7 @@
                                                             in
                                                                 ''
                                                                     ${ pkgs.coreutils }/bin/mkdir $out &&
-                                                                        ${ pkgs.coreutils }/bin/mkdir $out/bin &&
-                                                                        ## ${ pkgs.coreutils }/bin/echo '${ builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "${ pkgs.coreutils }/bin/echo $out" ] constructors ] ) }' > $out/bin/constructors.sh
-                                                                        ${ pkgs.coreutils }/bin/chmod 0555 $out/bin/constructors.sh
+                                                                        ${ pkgs.coreutils }/bin/mkdir $out/bin
                                                                 '' ;
                                                     name = "tests" ;
                                                     src = ./. ;
