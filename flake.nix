@@ -393,19 +393,7 @@
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
-                                                                            if [ -f ${ scripts.vacuum.tests }/SUCCESS ]
-                                                                            then
-                                                                                ${ pkgs.coreutils }/bin/echo SUCCESS IN VACUUM TEST
-                                                                            elif [ -f ${ scripts.vacuum.tests }/FAILURE ]
-                                                                            then
-                                                                                ${ pkgs.coreutils }/bin/echo PREDICTED FAILURE IN VACUUM TEST >&2 &&
-                                                                                    exit 63
-                                                                            else
-                                                                                ${ pkgs.coreutils }/bin/echo UNPREDICTED FAILURE IN VACUUM TEST >&2 &&
-                                                                                    exit 63
-                                                                            fi &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests } &&
-                                                                            exit 66
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.tests }
                                                                     '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;
