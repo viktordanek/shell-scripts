@@ -214,8 +214,39 @@
                                                         { }
                                                         shell-scripts ;
                                             } ;
+                                        scripts =
+                                            {
+                                                vacuum =
+                                                    _shell-script
+                                                        {
+                                                            environment =
+                                                                { resource , string , target } :
+                                                                    [
+                                                                        ( string "CAT" "${ pkgs.coreutils }/bin/cat" )
+                                                                        ( string "CHMOD" "${ pkgs.coreutils }/bin/chmod" )
+                                                                        ( string "CUT" "${ pkgs.coreutils }/bin/cut" )
+                                                                        ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                        ( string "FIND" "${ pkgs.findutils }/bin/find" )
+                                                                        ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
+                                                                        ( resource )
+                                                                        ( string "SHA512SUM" "${ pkgs.coreutils }/bin/sha512sum" )
+                                                                        ( string "WC" "${ pkgs.coreutils }/bin/wc" )
+                                                                        ( target )
+                                                                    ] ;
+                                                            extensions =
+                                                                {
+                                                                    # resource = ''--run "export RESOURCE=$( ${ pkgs.coreutils }/bin/mktemp ${ host-path }/XXXXXXXX"'' ;
+                                                                    string = name : value : "--set ${ name } ${ value }" ;
+                                                                    target = ''--run "export TARGET=${ _environment-variable "RESOURCE" }/target"'' ;
+                                                                } ;
+                                                            name = "vacuum" ;
+                                                            script = self + "/vacuum.sh" ;
+                                                            tests = [ ] ;
+                                                        } ;
+                                            } ;
                                 in
                                     {
+                                        scripts = scripts ;
                                         shell-scripts = _shell-scripts ;
                                         tests =
                                             pkgs.stdenv.mkDerivation
@@ -280,48 +311,6 @@
                                                 } ;
                                     } ;
                             pkgs = builtins.import nixpkgs { system = system ; } ;
-                            scripts =
-                                {
-                                    cache =
-                                        {
-                                            setup = null ;
-                                            keep = null ;
-                                            teardown = null ;
-                                        } ;
-                                    temporary =
-                                        {
-                                            setup = null ;
-                                            keep = null ;
-                                            teardown = null ;
-                                        } ;
-                                    vacuum =
-                                        _shell-script
-                                            {
-                                                environment =
-                                                    { resource , string , target } :
-                                                        [
-                                                            ( string "CAT" "${ pkgs.coreutils }/bin/cat" )
-                                                            ( string "CHMOD" "${ pkgs.coreutils }/bin/chmod" )
-                                                            ( string "CUT" "${ pkgs.coreutils }/bin/cut" )
-                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
-                                                            ( string "FIND" "${ pkgs.findutils }/bin/find" )
-                                                            ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
-                                                            ( resource )
-                                                            ( string "SHA512SUM" "${ pkgs.coreutils }/bin/sha512sum" )
-                                                            ( string "WC" "${ pkgs.coreutils }/bin/wc" )
-                                                            ( target )
-                                                        ] ;
-                                                extensions =
-                                                    {
-                                                        # resource = ''--run "export RESOURCE=$( ${ pkgs.coreutils }/bin/mktemp ${ host-path }/XXXXXXXX"'' ;
-                                                        string = name : value : "--set ${ name } ${ value }" ;
-                                                        target = ''--run "export TARGET=${ _environment-variable "RESOURCE" }/target"'' ;
-                                                    } ;
-                                                name = "vacuum" ;
-                                                script = self + "/vacuum.sh" ;
-                                                tests = [ ] ;
-                                            } ;
-                                } ;
                             in
                                 {
                                     checks =
@@ -402,24 +391,27 @@
                                                 pkgs.stdenv.mkDerivation
                                                     {
                                                         installPhase =
-                                                            ''
-                                                                ${ pkgs.coreutils }/bin/mkdir $out &&
-                                                                    ${ pkgs.coreutils }/bin/echo $out &&
-                                                                    if [ -f ${ scripts.vacuum.tests }/SUCCESS ]
-                                                                    then
-                                                                        ${ pkgs.coreutils }/bin/echo SUCCESS &&
-                                                                            ${ pkgs.coreutils }/bin/ln --symbolic ${ scripts.vacuum.tests } $out/SUCCESS
-                                                                    elif [ -f ${ scripts.vacuum.tests }/FAILURE ]
-                                                                    then
-                                                                        ${ pkgs.coreutils }/bin/echo FAILURE $out >&2 &&
-                                                                            ${ pkgs.coreutils }/bin/ln --symbolic ${ scripts.vacuum.tests }/FAILURE $out/FAILURE &&
-                                                                            exit 63
-                                                                    else
-                                                                        ${ pkgs.coreutils }/bin/echo ERROR $out >&2 &&
-                                                                            ${ pkgs.coreutils }/bin/touch $out/FAILURE &&
-                                                                            exit 63
-                                                                    fi
-                                                            '' ;
+                                                            let
+                                                                point = lib { } ;
+                                                                in
+                                                                    ''
+                                                                        ${ pkgs.coreutils }/bin/mkdir $out &&
+                                                                            ${ pkgs.coreutils }/bin/echo $out &&
+                                                                            if [ -f ${ point.scripts.vacuum.tests }/SUCCESS ]
+                                                                            then
+                                                                                ${ pkgs.coreutils }/bin/echo SUCCESS &&
+                                                                                    ${ pkgs.coreutils }/bin/ln --symbolic ${ point.scripts.vacuum.tests } $out/SUCCESS
+                                                                            elif [ -f ${ point.scripts.vacuum.tests }/FAILURE ]
+                                                                            then
+                                                                                ${ pkgs.coreutils }/bin/echo FAILURE $out >&2 &&
+                                                                                    ${ pkgs.coreutils }/bin/ln --symbolic ${ point.scripts.vacuum.tests }/FAILURE $out/FAILURE &&
+                                                                                    exit 63
+                                                                            else
+                                                                                ${ pkgs.coreutils }/bin/echo ERROR $out >&2 &&
+                                                                                    ${ pkgs.coreutils }/bin/touch $out/FAILURE &&
+                                                                                    exit 63
+                                                                            fi
+                                                                    '' ;
                                                         name = "vacuum" ;
                                                         src = ./. ;
                                                     } ;
