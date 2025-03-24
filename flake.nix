@@ -1,6 +1,7 @@
 {
     inputs =
         {
+            environment-variable.url = "github:viktordanek/environment-variable" ;
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
             originator-pid.url = "github:viktordanek/originator-pid" ;
@@ -10,11 +11,12 @@
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
-        { flake-utils , nixpkgs , originator-pid , self , shell-script , standard-input , string , visitor } :
+        { environment-variable , flake-utils , nixpkgs , originator-pid , self , shell-script , standard-input , string , visitor } :
             let
                 fun =
                     system :
                         let
+                            _environment-variable = builtins.getAttr system environment-variable.lib ;
                             _shell-script = builtins.getAttr system shell-script.lib ;
                             _visitor = builtins.getAttr system visitor.lib ;
                             lib =
@@ -160,7 +162,7 @@
                                                                                     primary = value ( injection path derivation ) ;
                                                                                     in
                                                                                         [
-                                                                                           "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                           # "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ] ;
                                                                     }
                                                                     {
@@ -169,7 +171,7 @@
                                                                                 builtins.concatLists
                                                                                     [
                                                                                         [
-                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ ( environment-variable "OUT" ) "links" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ]
                                                                                         ( builtins.concatLists list )
                                                                                     ] ;
@@ -178,7 +180,7 @@
                                                                                 builtins.concatLists
                                                                                     [
                                                                                         [
-                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ ( environment-variable "OUT" ) "links" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ]
                                                                                         ( builtins.concatLists ( builtins.attrValues set ) )
                                                                                     ] ;
