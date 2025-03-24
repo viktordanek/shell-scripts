@@ -225,7 +225,33 @@
                                                                         {
                                                                             shell-scripts =
                                                                                 {
-                                                                                    foobar =
+                                                                                    foobar-1 =
+                                                                                        { shell-script , ... } :
+                                                                                            shell-script
+                                                                                                {
+                                                                                                    environment =
+                                                                                                        { string , ... } :
+                                                                                                            [
+                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                                            ] ;
+                                                                                                    script = self + "/foobar.sh" ;
+                                                                                                    tests =
+                                                                                                        {
+                                                                                                            foobar-1 =
+                                                                                                                ignore :
+                                                                                                                    {
+                                                                                                                        standard-output = "hi" ;
+                                                                                                                        test = "candidate" ;
+                                                                                                                    } ;
+                                                                                                            foobar-2 =
+                                                                                                                ignore :
+                                                                                                                    {
+                                                                                                                        standard-output = "hi" ;
+                                                                                                                        test = "candidate" ;
+                                                                                                                    } ;
+                                                                                                        } ;
+                                                                                                } ;
+                                                                                    foobar-2 =
                                                                                         { shell-script , ... } :
                                                                                             shell-script
                                                                                                 {
