@@ -171,7 +171,7 @@
                                                                                 builtins.concatLists
                                                                                     [
                                                                                         [
-                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ ( environment-variable "OUT" ) "links" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                            "${ _environment-variable "MKDIR" } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ ( _environment-variable "OUT" ) "links" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ]
                                                                                         ( builtins.concatLists list )
                                                                                     ] ;
@@ -180,7 +180,7 @@
                                                                                 builtins.concatLists
                                                                                     [
                                                                                         [
-                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ ( environment-variable "OUT" ) "links" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                            "${ _environment-variable "MKDIR" } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ ( _environment-variable "OUT" ) "links" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ]
                                                                                         ( builtins.concatLists ( builtins.attrValues set ) )
                                                                                     ] ;
@@ -189,9 +189,11 @@
                                                             in
                                                                 ''
                                                                     ${ pkgs.coreutils }/bin/mkdir $out &&
-                                                                        ${ pkgs.coreutils }/bin/mkdir $out/bin
+                                                                        ${ pkgs.coreutils }/bin/mkdir $out/bin &&
+                                                                        makeWrapper ${ pkgs.writeShellScript "constructors" ( builtins.concatStringsSep " &&\n\t" constructors ) } $out/bin/constructors
                                                                 '' ;
                                                     name = "tests" ;
+                                                    nativeBuildInputs = [ pkgs.makeWrapper ] ;
                                                     src = ./. ;
                                                 } ;
                                     } ;
