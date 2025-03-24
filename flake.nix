@@ -130,7 +130,7 @@
                                                                                                 standard-input = builtins.getAttr system standard-input.lib ;
                                                                                                 string = builtins.getAttr system string.lib ;
                                                                                             } ;
-                                                                                        name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
+                                                                                        name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ) ;
                                                                                         script = script ;
                                                                                         tests = tests ;
                                                                                     }
@@ -194,7 +194,7 @@
                                                                                                                         "--set ${ name } ${ fun shell-scripts }" ;
                                                                                                         standard-input = builtins.getAttr system standard-input.lib ;
                                                                                                         string = builtins.getAttr system string.lib ;
-                                                                                                        name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
+                                                                                                        name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ) ;
                                                                                                         script = setup init release post ;
                                                                                                         tests = tests ;
                                                                                                     } ;
@@ -206,6 +206,7 @@
                                                     } ;
                                         primary =
                                             {
+                                                default-name = default-name ;
                                                 shell-scripts =
                                                     _visitor
                                                         {
@@ -285,7 +286,7 @@
                                                                                         ( builtins.concatLists ( builtins.attrValues set ) )
                                                                                     ] ;
                                                                     }
-                                                                    primary ;
+                                                                    primary.shell-scripts ;
                                                             in
                                                                 ''
                                                                     ${ pkgs.coreutils }/bin/mkdir $out &&
