@@ -235,7 +235,15 @@
                                                                                                                 ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
                                                                                                             ] ;
                                                                                                     script = self + "/foobar.sh" ;
-                                                                                                    tests = [ ] ;
+                                                                                                    tests =
+                                                                                                        {
+                                                                                                            foobar =
+                                                                                                                ignore :
+                                                                                                                    {
+                                                                                                                        standard-output = "hi" ;
+                                                                                                                        test = "candidate" ;
+                                                                                                                    } ;
+                                                                                                        } ;
                                                                                                 } ;
                                                                                 } ;
                                                                         } ;
