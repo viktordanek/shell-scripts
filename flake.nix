@@ -162,7 +162,7 @@
                                                                                     primary = value ( injection path derivation ) ;
                                                                                     in
                                                                                         [
-                                                                                           "echo ${ _environment-variable "LN" } --symbolic ### ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ ( _environment-variable "OUT" ) "links" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                           "${ _environment-variable "LN" } --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ ( _environment-variable "OUT" ) "links" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ] ;
                                                                     }
                                                                     {
@@ -225,6 +225,18 @@
                                                                         {
                                                                             shell-scripts =
                                                                                 {
+                                                                                    foobar =
+                                                                                        { shell-script , ... } :
+                                                                                            shell-script
+                                                                                                {
+                                                                                                    environment =
+                                                                                                        { string , ... } :
+                                                                                                            [
+                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                                            ] ;
+                                                                                                    script = self + "/foobar.sh" ;
+                                                                                                    tests = [ ] ;
+                                                                                                } ;
                                                                                 } ;
                                                                         } ;
                                                                 in
