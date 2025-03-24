@@ -237,7 +237,13 @@
                                                                                                     script = self + "/foobar.sh" ;
                                                                                                     tests =
                                                                                                         {
-                                                                                                            foobar =
+                                                                                                            foobar-1 =
+                                                                                                                ignore :
+                                                                                                                    {
+                                                                                                                        standard-output = "hi" ;
+                                                                                                                        test = "candidate" ;
+                                                                                                                    } ;
+                                                                                                            foobar-2 =
                                                                                                                 ignore :
                                                                                                                     {
                                                                                                                         standard-output = "hi" ;
