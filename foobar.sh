@@ -1,1 +1,1 @@
-${ECHO} hi
+${ECHO} -n hi
