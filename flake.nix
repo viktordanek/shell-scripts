@@ -192,6 +192,12 @@
                                                     } ;
                                         primary =
                                             {
+                                                default-name =
+                                                    if builtins.typeOf default-name == "string" then default-name
+                                                    else builtins.throw "default-name is not string but ${ builtins.typeOf default-name }." ;
+                                                host-path =
+                                                    if builtins.typeOf host-path == "string" then host-path
+                                                    else builtins.throw "host-path is not string but ${ builtins.typeOf host-path }." ;
                                                 shell-scripts =
                                                     _visitor
                                                         {
@@ -243,7 +249,7 @@
                                                                                                 ( builtins.concatLists ( builtins.attrValues set ) )
                                                                                             ] ;
                                                                             }
-                                                                            primary
+                                                                            primary.shell-scripts
                                                                     ) ;
                                                             in
                                                                 ''
