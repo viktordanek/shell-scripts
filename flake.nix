@@ -34,7 +34,7 @@
                                                 }
                                                 {
                                                 }
-                                                primary ;
+                                                primary.shell-scripts ;
                                         derivation =
                                             pkgs.stdenv.mkDerivation
                                                 {
@@ -72,7 +72,7 @@
                                                                                         ( builtins.concatLists ( builtins.attrValues set ) )
                                                                                     ] ;
                                                                     }
-                                                                    primary ;
+                                                                    primary.shell-scripts ;
                                                             in builtins.concatStringsSep " &&\n\t" constructors ;
                                                     name = "shell-scripts" ;
                                                     src = ./. ;
@@ -191,12 +191,15 @@
                                                                         else builtins.throw "There was a problem evaluating the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
                                                     } ;
                                         primary =
-                                            _visitor
-                                                {
-                                                    lambda = path : value : value ;
-                                                }
-                                                { }
-                                                shell-scripts ;
+                                            {
+                                                shell-scripts =
+                                                    _visitor
+                                                        {
+                                                            lambda = path : value : value ;
+                                                        }
+                                                        { }
+                                                        shell-scripts ;
+                                            } ;
                                 in
                                     {
                                         shell-scripts = _shell-scripts ;
