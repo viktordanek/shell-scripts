@@ -238,80 +238,23 @@
                                                                         {
                                                                             shell-scripts =
                                                                                 {
-                                                                                    file1 =
+                                                                                    shell-script =
                                                                                         { shell-script , ... } :
                                                                                             shell-script
                                                                                                 {
                                                                                                     environment =
                                                                                                         { string , ... } :
                                                                                                             [
+                                                                                                                ( string "CAT" "${ pkgs.coreutils }/bin/cat" )
+                                                                                                                ( string "CUT" "${ pkgs.coreutils }/bin/cut" )
+                                                                                                                ( string "CHMOD" "${ pkgs.coreutils }/bin/chmod" )
                                                                                                                 ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                                                ( string "SHA512SUM" "${ pkgs.coreutils }/bin/sha512sum" )
                                                                                                             ] ;
-                                                                                                    script = self + "/scripts/file.sh" ;
-                                                                                                } ;
-                                                                                    file2 =
-                                                                                        { shell-script , ... } :
-                                                                                            shell-script
-                                                                                                {
-                                                                                                    environment =
-                                                                                                        { string , ... } :
-                                                                                                            [
-                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
-                                                                                                            ] ;
-                                                                                                    script = self + "/scripts/file.sh" ;
-                                                                                                } ;
-                                                                                    foo =
-                                                                                        [
-                                                                                            {
-                                                                                                bar =
-                                                                                                    { shell-script , ... } :
-                                                                                                        shell-script
-                                                                                                            {
-                                                                                                                environment =
-                                                                                                                    { originator-pid , path-int , path-string , standard-input , shell-scripts , string } :
-                                                                                                                        [
-                                                                                                                            ( string "JQ" "${ pkgs.jq }/bin/jq" )
-                                                                                                                            ( shell-scripts "FOOBAR" ( shell-scripts : builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.foo ) 0 ) ) )
-                                                                                                                            ( originator-pid { } )
-                                                                                                                            ( path-int "PATH_INT" 1 )
-                                                                                                                            ( path-string "PATH_STRING" 2 )
-                                                                                                                            ( standard-input { } )
-                                                                                                                            ( string "TEMPLATE_FILE" ( self + "/scripts/foobar.json" ) )
-                                                                                                                            ( string "YQ" "${ pkgs.yq }/bin/yq" )
-                                                                                                                        ] ;
-                                                                                                                script = self + "/scripts/foobar.sh" ;
-                                                                                                                tests =
-                                                                                                                    {
-                                                                                                                        main =
-                                                                                                                            ignore :
-                                                                                                                                {
-                                                                                                                                    standard-output = builtins.readFile ( self + "/expected/standard-output" ) ;
-                                                                                                                                } ;
-                                                                                                                    } ;
-                                                                                                            } ;
-                                                                                            }
-                                                                                        ] ;
-                                                                                    init =
-                                                                                        { shell-script , ... } :
-                                                                                            shell-script
-                                                                                                {
-                                                                                                    environment =
-                                                                                                        { string , ... } :
-                                                                                                            [
-                                                                                                                ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
-                                                                                                            ] ;
-                                                                                                    script = self + "/scripts/init.sh" ;
-                                                                                                } ;
-                                                                                    noop =
-                                                                                        { shell-script , ... } :
-                                                                                            shell-script
-                                                                                                {
-                                                                                                    environment =
-                                                                                                        { string , ... } :
-                                                                                                            [
-                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
-                                                                                                            ] ;
-                                                                                                    script = self + "/scripts/noop.sh" ;
+                                                                                                    script = self + "/shell-script.sh" ;
+                                                                                                    tests =
+                                                                                                        [
+                                                                                                        ] ;
                                                                                                 } ;
                                                                                     # temporary =
                                                                                     #     { temporary , ... } :
@@ -327,9 +270,7 @@
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.init } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.noop } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) }
+                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.shell-script } &&
                                                                             exit 66
                                                                     '' ;
                                                         name = "foobar" ;
