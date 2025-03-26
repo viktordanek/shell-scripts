@@ -23,6 +23,7 @@
                             lib =
                                 {
                                     default-name ? "script" ,
+                                    host-path ? _environment-variable "TMPDIR" ,
                                     shell-scripts ? null ,
                                 } :
                                     let
@@ -144,6 +145,11 @@
                                                                             (
                                                                                 _shell-script
                                                                                     {
+                                                                                        environment =
+                                                                                            { string , ... } :
+                                                                                                [
+                                                                                                    ( string "MKTEMP" "${ pkgs.coreutils }/bin/mktemp" )
+                                                                                                ] ;
                                                                                         extensions =
                                                                                             {
                                                                                                 originator-pid = builtins.getAttr system originator-pid.lib ;
@@ -176,7 +182,7 @@
                                                                                                 string = builtins.getAttr system string.lib ;
                                                                                             } ;
                                                                                         name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ) ;
-                                                                                        script = null ;
+                                                                                        script = self + "/temporary/setup.sh" ;
                                                                                         tests = tests ;
                                                                                     }
                                                                             ) ;
