@@ -123,22 +123,36 @@
                                                                                                 standard-input = builtins.getAttr system standard-input.lib ;
                                                                                                 string = builtins.getAttr system string.lib ;
                                                                                             } ;
-                                                                                        name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
+                                                                                        name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ) ;
                                                                                         script = script ;
                                                                                         tests = tests ;
                                                                                     }
                                                                             ) ;
-                                                                        shell-scripts =
-                                                                            _visitor
-                                                                                {
-                                                                                    lambda = path : value : builtins.concatStringsSep "/" ( builtins.concatLists [ [ derivation ] ( builtins.map builtins.toJSON path ) ] ) ;
-                                                                                }
-                                                                                {
-                                                                                }
-                                                                                primary ;
                                                                     in
                                                                         if eval.success then eval.value
                                                                         else builtins.throw "There was a problem evaluating the shell-script defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
+                                                        temporary =
+                                                            {
+                                                                init ? null ,
+                                                                post ? null ,
+                                                                release ? null ,
+                                                                tests ? null
+                                                            } :
+                                                                let
+                                                                    eval =
+                                                                        builtins.tryEval
+                                                                            (
+                                                                                _shell-script
+                                                                                    {
+                                                                                        extensions = [ ] ;
+                                                                                        name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ) ;
+                                                                                        script = null ;
+                                                                                        tests = tests ;
+                                                                                    }
+                                                                            ) ;
+                                                                    in
+                                                                        if eval.success then eval.value
+                                                                        else builtins.throw "There was a problem evaluating the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
                                                     } ;
                                         primary =
                                             _visitor
