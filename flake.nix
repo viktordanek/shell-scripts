@@ -1,6 +1,7 @@
 {
     inputs =
         {
+            environment-variable.url = "github:viktordanek/environment-variable" ;
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
             originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
@@ -11,11 +12,12 @@
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
-        { flake-utils , nixpkgs , originator-pid , self , shell-script , standard-input , temporary , string , visitor } :
+        { environment-variable , flake-utils , nixpkgs , originator-pid , self , shell-script , standard-input , temporary , string , visitor } :
             let
                 fun =
                     system :
                         let
+                            _environment-variable = builtins.getAttr system environment-variable.lib ;
                             _shell-script = builtins.getAttr system shell-script.lib ;
                             _visitor = builtins.getAttr system visitor.lib ;
                             lib =
@@ -185,41 +187,62 @@
                                                     installPhase =
                                                         let
                                                             constructors =
-                                                                _visitor
-                                                                    {
-                                                                        lambda =
-                                                                            path : value :
-                                                                                let
-                                                                                    primary = value ( injection path derivation ) ;
-                                                                                    in
-                                                                                        [
-                                                                                           # "if ! ${ pkgs.diffutils }/bin/diff --recursive ${ primary.tests }/expected ${ primary.tests }/observed ; then ${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) } ; fi"
-                                                                                           "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                        ] ;
-                                                                    }
-                                                                    {
-                                                                        list =
-                                                                            path : list :
-                                                                                builtins.concatLists
-                                                                                    [
-                                                                                        [
-                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                        ]
-                                                                                        ( builtins.concatLists list )
-                                                                                    ] ;
-                                                                        set =
-                                                                            path : set :
-                                                                                builtins.concatLists
-                                                                                    [
-                                                                                        [
-                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                        ]
-                                                                                        ( builtins.concatLists ( builtins.attrValues set ) )
-                                                                                    ] ;
-                                                                    }
-                                                                    primary ;
-                                                            in builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "${ pkgs.coreutils }/bin/echo $out" ] constructors ] ) ;
+                                                                builtins.concatStringsSep
+                                                                    " &&\n\t"
+                                                                    (
+                                                                        _visitor
+                                                                            {
+                                                                                lambda =
+                                                                                    path : value :
+                                                                                        let
+                                                                                            primary = value ( injection path derivation ) ;
+                                                                                            in
+                                                                                                [
+                                                                                                   # "if ! ${ pkgs.diffutils }/bin/diff --recursive ${ primary.tests }/expected ${ primary.tests }/observed ; then ${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) } ; fi"
+                                                                                                   "${ _environment-variable "LN" } --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ ( _environment-variable "OUT" ) "links" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                                ] ;
+                                                                            }
+                                                                            {
+                                                                                list =
+                                                                                    path : list :
+                                                                                        builtins.concatLists
+                                                                                            [
+                                                                                                [
+                                                                                                    "${ _environment-variable "MKDIR" } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ ( _environment-variable "OUT" ) "links" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                                ]
+                                                                                                ( builtins.concatLists list )
+                                                                                            ] ;
+                                                                                set =
+                                                                                    path : set :
+                                                                                        builtins.concatLists
+                                                                                            [
+                                                                                                [
+                                                                                                    "${ _environment-variable "MKDIR" } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ ( _environment-variable "OUT" ) "links" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                                ]
+                                                                                                ( builtins.concatLists ( builtins.attrValues set ) )
+                                                                                            ] ;
+                                                                            }
+                                                                            primary
+                                                                    ) ;
+                                                            in
+                                                                ''
+                                                                    ${ pkgs.coreutils }/bin/mkdir $out &&
+                                                                        ${ pkgs.coreutils }/bin/mkdir $out/bin &&
+                                                                        makeWrapper ${ pkgs.writeShellScript "constructors" constructors } $out/bin/constructors --set LN ${ pkgs.coreutils }/bin/ln --set MKDIR ${ pkgs.coreutils }/bin/mkdir --set OUT $out &&
+                                                                        $out/bin/constructors &&
+                                                                        ALL=$( ${ pkgs.findutils }/bin/find $out/links -mindepth 1 -type l | ${ pkgs.coreutils }/bin/wc --lines ) &&
+                                                                        SUCCESS=$( ${ pkgs.findutils }/bin/find $out/links -mindepth 1 -type l -exec ${ pkgs.coreutils }/bin/readlink {} \; | while read LINK ; do ${ pkgs.findutils }/bin/find $( ${ pkgs.coreutils }/bin/tee ) -mindepth 1 -maxdepth 1 -type f -name SUCCESS ; done | ${ pkgs.coreutils }/bin/wc --lines ) &&
+                                                                        FAILURE=$( ${ pkgs.findutils }/bin/find $out/links -mindepth 1 -type l -exec ${ pkgs.coreutils }/bin/readlink {} \; | while read LINK ; do ${ pkgs.findutils }/bin/find $( ${ pkgs.coreutils }/bin/tee ) -mindepth 1 -maxdepth 1 -type f -name FAILURE ; done | ${ pkgs.coreutils }/bin/wc --lines ) &&
+                                                                        if [ ${ _environment-variable "ALL" } == ${ _environment-variable "SUCCESS" } ]
+                                                                        then
+                                                                            ${ pkgs.coreutils }/bin/echo ${ _environment-variable "SUCCESS" } > $out/SUCCESS
+                                                                        elif [ ${ _environment-variable "ALL" } == $(( ${ _environment-variable "SUCCESS" } + ${ _environment-variable "FAILURE" } )) ]
+                                                                        then
+                                                                            ${ pkgs.coreutils }/bin/echo ${ _environment-variable "FAILURE" } > $out/FAILURE
+                                                                        fi
+                                                                '' ;
                                                     name = "tests" ;
+                                                    nativeBuildInputs = [ pkgs.makeWrapper ] ;
                                                     src = ./. ;
                                                 } ;
                                     } ;
@@ -271,7 +294,17 @@
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/touch $out &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.shell-script } &&
-                                                                            exit 66
+                                                                            if [ -f ${ shell-scripts.tests }/SUCCESS ]
+                                                                            then
+                                                                                ${ pkgs.coreutils }/bin/echo "The tests SUCCEEDED"
+                                                                            elif [ -f ${ shell-scripts.tests }/FAILURE ]
+                                                                            then
+                                                                                ${ pkgs.coreutils }/bin/echo "There was a predicted failure in ${ shell-scripts.tests }" >&2 &&
+                                                                                    exit 63
+                                                                            else
+                                                                                ${ pkgs.coreutils }/bin/echo "There was an unpredicted failure in ${ shell-scripts.tests }" >&2 &&
+                                                                                    exit 62
+                                                                            fi
                                                                     '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;
