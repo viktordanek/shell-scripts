@@ -5,7 +5,7 @@
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
             originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
-            shell-script.url = "github:viktordanek/shell-script/milestone/03282025" ;
+            shell-script.url = "github:viktordanek/shell-script" ;
             string.url = "github:viktordanek/string" ;
             standard-input.url = "github:viktordanek/standard-input" ;
             temporary.url = "github:viktordanek/temporary" ;
@@ -274,6 +274,31 @@
                                                 } ;
                                     } ;
                             pkgs = builtins.import nixpkgs { system = system ; } ;
+                            scripts =
+                                {
+                                    temporary =
+                                        {
+                                            setup =
+                                                let
+                                                    setup =
+                                                        pkgs.stdenv.mkDerivation
+                                                            {
+                                                                installPhase =
+                                                                    ''
+                                                                    '' ;
+                                                                name = "setup" ;
+                                                                src = ./. ;
+                                                            } ;
+                                                    in
+                                                        {
+
+                                                        } ;
+                                            teardown =
+                                                {
+
+                                                } ;
+                                        } ;
+                                } ;
                             in
                                 {
                                     checks =
@@ -328,15 +353,6 @@
                                                                                                                     } ;
                                                                                                         } ;
                                                                                                 } ;
-                                                                                    # temporary =
-                                                                                    #     { temporary , ... } :
-                                                                                    #         temporary
-                                                                                    #             {
-                                                                                    #                 init = shell-scripts : shell-scripts.init ;
-                                                                                    #                 release = shell-scripts : shell-scripts.noop ;
-                                                                                    #                 post = shell-scripts : shell-scripts.noop ;
-                                                                                    #                 tests = [ ] ;
-                                                                                    #           } ;
                                                                                 } ;
                                                                         } ;
                                                                 in
