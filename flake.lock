@@ -473,17 +473,16 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1742466876,
+        "lastModified": 1742562294,
         "narHash": "sha256-qHYSZqJa7ND4rYt1D9fWnYvBbolxtsiy0P+irp87Pfs=",
         "owner": "viktordanek",
         "repo": "originator-pid",
-        "rev": "6119b7f41d4b666d535a21862aaaa906fbe197a7",
+        "rev": "5e1ca87cd8b616f7ca57cbe367ec9020512fbe2b",
         "type": "github"
       },
       "original": {
         "owner": "viktordanek",
         "repo": "originator-pid",
-        "rev": "6119b7f41d4b666d535a21862aaaa906fbe197a7",
         "type": "github"
       }
     },

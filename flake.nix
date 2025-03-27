@@ -4,7 +4,7 @@
             environment-variable.url = "github:viktordanek/environment-variable" ;
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
-            originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
+            originator-pid.url = "github:viktordanek/originator-pid" ;
             shell-script.url = "github:viktordanek/shell-script" ;
             string.url = "github:viktordanek/string" ;
             standard-input.url = "github:viktordanek/standard-input" ;
