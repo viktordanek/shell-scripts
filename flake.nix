@@ -188,7 +188,7 @@
                                                                         lambda =
                                                                             path : value :
                                                                                 let
-                                                                                    primary = value ( injection path derivation ) ;
+                                                                                    primary = value ( injection path "$out" ) ;
                                                                                     in
                                                                                         [
                                                                                            # "if ! ${ pkgs.diffutils }/bin/diff --recursive ${ primary.tests }/expected ${ primary.tests }/observed ; then ${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) } ; fi"
