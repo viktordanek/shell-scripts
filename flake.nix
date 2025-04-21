@@ -153,11 +153,11 @@
                                                                                              else if builtins.typeOf init == "null" then init
                                                                                              else builtins.throw "The init for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf init }." ;
                                                                                         post =
-                                                                                            if builtins.typeOf post == "lambda" then post shell-scripts
+                                                                                            if builtins.typeOf post == "lambda" then post _shell-scripts
                                                                                             else if builtins.typeOf post == "null" then post
                                                                                             else builtins.throw "The post for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf post }." ;
                                                                                         release =
-                                                                                            if builtins.typeOf init == "lambda" then release shell-scripts
+                                                                                            if builtins.typeOf init == "lambda" then release _shell-scripts
                                                                                             else if builtins.typeOf release == "null" then release
                                                                                             else builtins.throw "The release for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf release }." ;
                                                                                         tests = tests ;
