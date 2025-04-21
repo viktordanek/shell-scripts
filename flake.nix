@@ -4,10 +4,10 @@
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
             originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
-            shell-script.url = "github:viktordanek/shell-script" ;
+            shell-script.url = "github:viktordanek/shell-script/issue/47-new-imple" ;
             string.url = "github:viktordanek/string" ;
             standard-input.url = "github:viktordanek/standard-input" ;
-            temporary.url = "github:viktordanek/temporary" ;
+            temporary.url = "github:viktordanek/temporary/issue/60-new-implementation-1" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
@@ -79,7 +79,7 @@
                                                     {
                                                         shell-script =
                                                             {
-                                                                environment ? x : [ ] ,
+                                                                profile ? x : [ ] ,
                                                                 script ,
                                                                 tests ? null
                                                             } :
@@ -89,7 +89,6 @@
                                                                             (
                                                                                 _shell-script
                                                                                     {
-                                                                                        environment = environment ;
                                                                                         extensions =
                                                                                             {
                                                                                                 originator-pid = builtins.getAttr system originator-pid.lib ;
@@ -122,6 +121,7 @@
                                                                                                 string = builtins.getAttr system string.lib ;
                                                                                             } ;
                                                                                         name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
+                                                                                        profile = profile ;
                                                                                         script = script ;
                                                                                         tests = tests ;
                                                                                     }
@@ -242,7 +242,7 @@
                                                                                         { shell-script , ... } :
                                                                                             shell-script
                                                                                                 {
-                                                                                                    environment =
+                                                                                                    profile =
                                                                                                         { string , ... } :
                                                                                                             [
                                                                                                                 ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
@@ -253,7 +253,7 @@
                                                                                         { shell-script , ... } :
                                                                                             shell-script
                                                                                                 {
-                                                                                                    environment =
+                                                                                                    profile =
                                                                                                         { string , ... } :
                                                                                                             [
                                                                                                                 ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
@@ -267,7 +267,7 @@
                                                                                                     { shell-script , ... } :
                                                                                                         shell-script
                                                                                                             {
-                                                                                                                environment =
+                                                                                                                profile =
                                                                                                                     { originator-pid , path-int , path-string , standard-input , shell-scripts , string } :
                                                                                                                         [
                                                                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
@@ -295,7 +295,7 @@
                                                                                         { shell-script , ... } :
                                                                                             shell-script
                                                                                                 {
-                                                                                                    environment =
+                                                                                                    profile =
                                                                                                         { string , ... } :
                                                                                                             [
                                                                                                                 ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
@@ -306,7 +306,7 @@
                                                                                         { shell-script , ... } :
                                                                                             shell-script
                                                                                                 {
-                                                                                                    environment =
+                                                                                                    profile =
                                                                                                         { string , ... } :
                                                                                                             [
                                                                                                                 ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
