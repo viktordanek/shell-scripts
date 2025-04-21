@@ -149,7 +149,7 @@
                                                                                 builtins.getAttr system temporary.lib
                                                                                     {
                                                                                         init =
-                                                                                             if builtins.typeOf init == "lambda" then builtins.trace "HI ${ builtins.builtins.concatStringsSep ";" ( builtins.attrNames shell-scripts ) } " ( init shell-scripts )
+                                                                                             if builtins.typeOf init == "lambda" then init _shell-scripts
                                                                                              else if builtins.typeOf init == "null" then init
                                                                                              else builtins.throw "The init for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf init }." ;
                                                                                         post =
