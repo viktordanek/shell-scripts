@@ -91,14 +91,13 @@
                                                                                     {
                                                                                         extensions =
                                                                                             {
-                                                                                                originator-pid = builtins.getAttr system originator-pid.lib ;
                                                                                                 path-int =
                                                                                                     name : index :
                                                                                                         if builtins.typeOf index == "int" then
                                                                                                             if index < 0 then builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is less than zero."
                                                                                                             else if index >= builtins.length path then builtins.throw "The index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is greater than or equal to the length of the path ${ builtins.toString ( builtins.length path ) }."
                                                                                                             else
-                                                                                                                if builtins.typeOf ( builtins.elemAt path index ) == "int" then "--set ${ name } ${ builtins.toString ( builtins.elemAt path index ) }"
+                                                                                                                if builtins.typeOf ( builtins.elemAt path index ) == "int" then "export ${ name }=${ builtins.toString ( builtins.elemAt path index ) }"
                                                                                                                 else if builtins.typeOf ( builtins.elemAt path index ) == "string" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is a string and not an int it would be better to use path-string."
                                                                                                                 else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
                                                                                                         else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
@@ -108,7 +107,7 @@
                                                                                                             if index < 0 then builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is less than zero."
                                                                                                             else if index >= builtins.length path then builtins.throw "The index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is greater than or equal to the length of the path ${ builtins.toString ( builtins.length path ) }."
                                                                                                             else
-                                                                                                                if builtins.typeOf ( builtins.elemAt path index ) == "string" then "--set ${ name } ${ builtins.elemAt path index }"
+                                                                                                                if builtins.typeOf ( builtins.elemAt path index ) == "string" then "export ${ name }=${ builtins.elemAt path index }"
                                                                                                                 else if builtins.typeOf ( builtins.elemAt path index ) == "int" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is an int and not a string it would be better to use path-int."
                                                                                                                 else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
                                                                                                         else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
@@ -116,9 +115,8 @@
                                                                                                     name : fun :
                                                                                                         let
                                                                                                             in
-                                                                                                                "--set ${ name } ${ fun shell-scripts }" ;
-                                                                                                standard-input = builtins.getAttr system standard-input.lib ;
-                                                                                                string = builtins.getAttr system string.lib ;
+                                                                                                                "export ${ name }=${ fun shell-scripts }" ;
+                                                                                                string = name : value : "export ${ name }=${ builtins.toString value }" ;
                                                                                             } ;
                                                                                         name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
                                                                                         profile = profile ;
@@ -151,7 +149,7 @@
                                                                                 builtins.getAttr system temporary.lib
                                                                                     {
                                                                                         init =
-                                                                                             if builtins.typeOf init == "lambda" then init shell-scripts
+                                                                                             if builtins.typeOf init == "lambda" then builtins.trace "HI ${ builtins.builtins.concatStringsSep ";" ( builtins.attrNames _shell-scripts ) } " ( init _shell-scripts )
                                                                                              else if builtins.typeOf init == "null" then init
                                                                                              else builtins.throw "The init for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf init }." ;
                                                                                         post =
@@ -268,14 +266,12 @@
                                                                                                         shell-script
                                                                                                             {
                                                                                                                 profile =
-                                                                                                                    { originator-pid , path-int , path-string , standard-input , shell-scripts , string } :
+                                                                                                                    { path-int , path-string , shell-scripts , string } :
                                                                                                                         [
                                                                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
                                                                                                                             ( shell-scripts "FOOBAR" ( shell-scripts : builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.foo ) 0 ) ) )
-                                                                                                                            ( originator-pid { } )
                                                                                                                             ( path-int "PATH_INT" 1 )
                                                                                                                             ( path-string "PATH_STRING" 2 )
-                                                                                                                            ( standard-input { } )
                                                                                                                             ( string "TEMPLATE_FILE" ( self + "/scripts/foobar.json" ) )
                                                                                                                             ( string "YQ" "${ pkgs.yq }/bin/yq" )
                                                                                                                         ] ;
@@ -317,6 +313,7 @@
                                                                                         { temporary , ... } :
                                                                                             temporary
                                                                                                 {
+                                                                                                    init = shell-scripts : shell-scripts.init ;
                                                                                                 } ;
                                                                                 } ;
                                                                         } ;

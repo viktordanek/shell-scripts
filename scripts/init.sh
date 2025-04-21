@@ -1,1 +1,1 @@
-${MKDIR} ${TARGET}
+${MKDIR} /mount/target
