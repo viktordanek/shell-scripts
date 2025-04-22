@@ -178,6 +178,10 @@
                                                                                                         in _shell-script arguments
                                                                                                 ) ;
                                                                                         in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
+                                                                            # temporary =
+                                                                            #     {
+                                                                            #
+                                                                            #    } ;
                                                                         } ;
                                                         }
                                                         { }
@@ -186,6 +190,22 @@
                                     in
                                         {
                                             derivation = derivation ;
+                                            shell-scripts =
+                                                _visitor
+                                                    {
+                                                        lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
+                                                    }
+                                                    { }
+                                                    primary.shell-scripts ;
+                                            tests =
+                                                pkgs.stdenv.mkderivation
+                                                    {
+                                                        installPhase =
+                                                            ''
+                                                            '' ;
+                                                        name = "tests" ;
+                                                        src = ./. ;
+                                                    } ;
                                         } ;
                                 pkgs = builtins.import nixpkgs { system = system ; } ;
                             in
@@ -194,8 +214,8 @@
                                         {
                                             foobar =
                                                 {
-                                                    type = "program" ;
-                                                    program = "${ pkgs.coreutils }/bin/echo ${ foobar.derivation }" ;
+                                                    type = "app" ;
+                                                    program = "${ foobar.shell-scripts.foobar }" ;
                                                 } ;
                                         } ;
                                     checks =
