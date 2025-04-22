@@ -145,7 +145,7 @@
                                                                                                             } ;
                                                                                                         in _shell-script arguments
                                                                                                 ) ;
-                                                                                        in builtins.trace "HI" ( if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ) ;
+                                                                                        in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
                                                                         } ;
                                                         }
                                                         { }
