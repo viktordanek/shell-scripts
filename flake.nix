@@ -88,7 +88,7 @@
                                                     _visitor
                                                         {
                                                             lambda =
-                                                                builtins.trace "primary.shell-scripts:lambda" ( path : value : ignore :
+                                                                path : value : ignore :
                                                                     value
                                                                         {
                                                                             shell-script =
@@ -146,7 +146,7 @@
                                                                                                         in _shell-script arguments
                                                                                                 ) ;
                                                                                         in builtins.trace "HI" ( if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ) ;
-                                                                        } ) ;
+                                                                        } ;
                                                         }
                                                         { }
                                                         shell-scripts ;
