@@ -150,7 +150,7 @@
                                                                                                                                     shell-scripts =
                                                                                                                                         _visitor
                                                                                                                                             {
-                                                                                                                                                lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }" ;
+                                                                                                                                                lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
                                                                                                                                             }
                                                                                                                                             { }
                                                                                                                                             primary.shell-scripts ;
@@ -198,11 +198,32 @@
                                                     { }
                                                     primary.shell-scripts ;
                                             tests =
-                                                pkgs.stdenv.mkderivation
+                                                pkgs.stdenv.mkDerivation
                                                     {
                                                         installPhase =
-                                                            ''
-                                                            '' ;
+                                                            let
+                                                                constructor =
+                                                                    _visitor
+                                                                        {
+                                                                            lambda =
+                                                                                path : value :
+                                                                                    let
+                                                                                        point = value null ;
+                                                                                        in [] ; # [ "${ _environment-variable "LN" } --symbolic ${ point.tests } ${ _environment-variable "OUT" }/${ builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) }" ] ;
+                                                                            null = path : value : [ ] ;
+                                                                        }
+                                                                        {
+                                                                            list = path : list : builtins.concatLists list ;
+                                                                            set = path : set : builtins.concatLists ( builtins.attrValues set ) ;
+                                                                        }
+                                                                        primary.shell-scripts ;
+                                                                in
+                                                                    ''
+                                                                        ${ pkgs.coreutils }/bin/mkdir $out &&
+                                                                            ${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.writeShellScript "constructor.sh" ( builtins.concatStringsSep " &&\n\t" constructor ) } $out/constructor.sh &&
+                                                                            makeWrapper $out/constructor.sh $out/constructor.wrapped.sh --set LN ${ pkgs.coreutils }/bin/ln" --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set OUT $out &&
+                                                                            $out/constructor.wrapped.sh
+                                                                    '' ;
                                                         name = "tests" ;
                                                         src = ./. ;
                                                     } ;
@@ -226,7 +247,7 @@
                                                         installPhase =
                                                             ''
                                                                 ${ pkgs.coreutils }/bin/touch $out &&
-                                                                    ${ pkgs.coreutils }/bin/echo ${ foobar.derivation } &&
+                                                                    ${ pkgs.coreutils }/bin/echo ${ foobar.tests } &&
                                                                     exit 64
                                                             '' ;
                                                         name = "foobar" ;
