@@ -28,8 +28,11 @@
                                                                 profile =
                                                                     { path , string } :
                                                                         [
+                                                                            ( string "JQ" "${ pkgs.jq }/bin/jq" )
                                                                             ( path "PATH_VALUE" 0 )
                                                                             ( string "STRING_VALUE" "a1895e773961f633c7c6178a7fda16f8d630cfcbc911080c7c8ec713dd882b8b5152abcc22c40b324c8b5df01070ba57348c02788cb07b31464fcba309036d1c" )
+                                                                            ( string "TEMPLATE_FILE" ( self + "/scripts/foobar.json" ) )
+                                                                            ( string "YQ" "${ pkgs.yq }/bin/yq" )
                                                                         ] ;
                                                                 script = self + "/scripts/foobar.sh" ;
                                                             } ;
@@ -54,28 +57,12 @@
                                                                         lambda =
                                                                             path : value :
                                                                                 [
-                                                                                    "${ _environment-variable "ECHO" } makeWrapper ${ let x = value null ; in builtins.concatStringsSep ";" ( builtins.attrNames x ) }"
+                                                                                    "makeWrapper ${ let x = value null ; in x.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh"
                                                                                 ] ;
                                                                     }
                                                                     {
-                                                                        list =
-                                                                            path : list :
-                                                                                builtins.concatLists
-                                                                                    [
-                                                                                        [
-                                                                                            "${ _environment-variable "MKDIR" } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                        ]
-                                                                                        ( builtins.concatLists list )
-                                                                                    ] ;
-                                                                        set =
-                                                                            path : set :
-                                                                                builtins.concatLists
-                                                                                    [
-                                                                                        [
-                                                                                            "${ _environment-variable "MKDIR" } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                        ]
-                                                                                        ( builtins.concatLists ( builtins.attrValues set ) )
-                                                                                    ] ;
+                                                                        list = path : list : builtins.concatLists list ;
+                                                                        set = path : set : builtins.concatLists ( builtins.attrValues set ) ;
                                                                     }
                                                                     primary.shell-scripts ;
                                                             in
@@ -83,7 +70,8 @@
                                                                     ${ pkgs.coreutils }/bin/mkdir $out &&
                                                                         ${ pkgs.coreutils }/bin/mkdir $out/bin
                                                                         ${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.writeShellScript "constructors" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "source ${ _environment-variable "MAKE_WRAPPER" }/nix-support/setup-hook" ] constructor ] ) ) } $out/bin/constructor.sh &&
-                                                                        makeWrapper $out/bin/constructor.sh $out/bin/constructor.wrapped.sh --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set MKDIR ${ pkgs.coreutils }/bin/mkdir --set OUT $out
+                                                                        makeWrapper $out/bin/constructor.sh $out/bin/constructor.wrapped.sh --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set MKDIR ${ pkgs.coreutils }/bin/mkdir --set OUT $out &&
+                                                                        $out/bin/constructor.wrapped.sh
                                                                 '' ;
                                                     name = "derivation" ;
                                                     nativeBuildInputs = [ pkgs.makeWrapper ] ;
@@ -105,8 +93,8 @@
                                                                         {
                                                                             shell-script =
                                                                                 {
-                                                                                    mounts ? null ,
-                                                                                    name ? if builtins.length path > 0 then builtins.elemAt ( ( builtins.length path ) - 1 ) else primary.default-name ,
+                                                                                    mounts ? { } ,
+                                                                                    name ? if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ,
                                                                                     profile ? { ... } : [ ] ,
                                                                                     script ,
                                                                                     tests ? null
