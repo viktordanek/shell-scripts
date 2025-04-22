@@ -209,7 +209,7 @@
                                                                                 path : value :
                                                                                     let
                                                                                         point = value null ;
-                                                                                        in [] ; # [ "${ _environment-variable "LN" } --symbolic ${ point.tests } ${ _environment-variable "OUT" }/${ builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) }" ] ;
+                                                                                        in [ ] ; # [ "${ _environment-variable "LN" } --symbolic ${ point.tests } ${ _environment-variable "OUT" }/${ builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) }" ] ;
                                                                             null = path : value : [ ] ;
                                                                         }
                                                                         {
@@ -220,11 +220,12 @@
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/mkdir $out &&
-                                                                            ${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.writeShellScript "constructor.sh" ( builtins.concatStringsSep " &&\n\t" constructor ) } $out/constructor.sh &&
-                                                                            makeWrapper $out/constructor.sh $out/constructor.wrapped.sh --set LN ${ pkgs.coreutils }/bin/ln" --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set OUT $out &&
+                                                                            ${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.writeShellScript "constructor.sh" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "source ${ _environment-variable "MAKE_WRAPPER" }/nix-support/setup-hook" ] constructor ] ) ) } $out/constructor.sh &&
+                                                                            makeWrapper $out/constructor.sh $out/constructor.wrapped.sh --set LN ${ pkgs.coreutils }/bin/ln --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set OUT $out &&
                                                                             $out/constructor.wrapped.sh
                                                                     '' ;
                                                         name = "tests" ;
+                                                        nativeBuildInputs = [ pkgs.makeWrapper ] ;
                                                         src = ./. ;
                                                     } ;
                                         } ;
