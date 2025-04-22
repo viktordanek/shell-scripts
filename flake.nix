@@ -29,7 +29,7 @@
                                                                     { path , shell-script , string } :
                                                                         [
                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
-                                                                            # ( shell-script "NOOP" ( shell-scripts : shell-scripts.noop ) )
+                                                                            ( shell-script "NOOP" ( shell-scripts : shell-scripts.noop ) )
                                                                             ( path "PATH_VALUE" 0 )
                                                                             ( string "STRING_VALUE" "a1895e773961f633c7c6178a7fda16f8d630cfcbc911080c7c8ec713dd882b8b5152abcc22c40b324c8b5df01070ba57348c02788cb07b31464fcba309036d1c" )
                                                                             ( string "TEMPLATE_FILE" ( self + "/scripts/foobar.json" ) )
