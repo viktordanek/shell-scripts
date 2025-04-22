@@ -1,6 +1,3 @@
 arguments: ''
-foobar: /nix/store/nf95cqqkffpla09rmf3413qmnpizayan-shell-scripts/foo/0/bar
-originator-pid: '73'
-path-int: '0'
-path-string: bar
-standard-input: ''
+path: foobar
+string: a1895e773961f633c7c6178a7fda16f8d630cfcbc911080c7c8ec713dd882b8b5152abcc22c40b324c8b5df01070ba57348c02788cb07b31464fcba309036d1c

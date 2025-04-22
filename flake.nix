@@ -36,7 +36,11 @@
                                                                             ( string "YQ" "${ pkgs.yq }/bin/yq" )
                                                                         ] ;
                                                                 script = self + "/scripts/foobar.sh" ;
-                                                                tests = { } ;
+                                                                tests =
+                                                                    ignore :
+                                                                        {
+                                                                            standard-output = self + "/expected/standard-output" ;
+                                                                        } ;
                                                             } ;
                                                 noop =
                                                     { shell-script , ... } :
