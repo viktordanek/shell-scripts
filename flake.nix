@@ -85,7 +85,7 @@
                                                     else builtins.throw "default-name is not string but ${ builtins.typeOf default-name }." ;
                                                 resources = resources ;
                                                 shell-scripts =
-                                                    builtins.trace "primary.shell-scripts" ( _visitor
+                                                    _visitor
                                                         {
                                                             lambda =
                                                                 builtins.trace "primary.shell-scripts:lambda" ( path : value : ignore :
@@ -149,7 +149,7 @@
                                                                         } ) ;
                                                         }
                                                         { }
-                                                        shell-scripts ) ;
+                                                        shell-scripts ;
                                             } ;
                                     in
                                         {
