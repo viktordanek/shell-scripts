@@ -16,6 +16,24 @@
                         let
                             _environment-variable = builtins.getAttr system environment-variable.lib ;
                             _visitor = builtins.getAttr system visitor.lib ;
+                            foobar =
+                                lib
+                                    {
+                                        shell-scripts =
+                                            {
+                                                foobar =
+                                                    { shell-script , ... } :
+                                                        {
+                                                            profile =
+                                                                { path , string } :
+                                                                    [
+                                                                        ( path "PATH_VALUE" 0 )
+                                                                        ( string "STRING_VALUE" "a1895e773961f633c7c6178a7fda16f8d630cfcbc911080c7c8ec713dd882b8b5152abcc22c40b324c8b5df01070ba57348c02788cb07b31464fcba309036d1c" )
+                                                                    ] ;
+                                                            script = self + "/scripts/foobar.sh" ;
+                                                        } ;
+                                            } ;
+                                    } ;
                             lib =
                                 {
                                     archive ? "ARCHIVE" ,
@@ -29,13 +47,13 @@
                                                 {
                                                     installPhase =
                                                         let
-                                                            constructors =
+                                                            constructor =
                                                                 _visitor
                                                                     {
                                                                         lambda =
                                                                             path : value :
                                                                                 [
-                                                                                    "${ _environment-variable "MKDIR" } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
+                                                                                    "${ _environment-variable "ECHO" } makeWrapper ${ let x = value null ; in builtins.concatStringsSep ";" ( builtins.attrNames x ) }"
                                                                                 ] ;
                                                                     }
                                                                     {
@@ -46,7 +64,7 @@
                                                                                         [
                                                                                             "${ _environment-variable "MKDIR" } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ]
-                                                                                        list
+                                                                                        ( builtins.concatLists list )
                                                                                     ] ;
                                                                         set =
                                                                             path : set :
@@ -55,16 +73,16 @@
                                                                                         [
                                                                                             "${ _environment-variable "MKDIR" } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
                                                                                         ]
-                                                                                        ( builtins.attrValues set )
+                                                                                        ( builtins.concatLists ( builtins.attrValues set ) )
                                                                                     ] ;
                                                                     }
-                                                                    shell-scripts ;
+                                                                    primary.shell-scripts ;
                                                             in
                                                                 ''
                                                                     ${ pkgs.coreutils }/bin/mkdir $out &&
                                                                         ${ pkgs.coreutils }/bin/mkdir $out/bin
-                                                                        ${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.writeShellScript "constructors" ( builtins.toFile "constructors" builtins.concatStringsSep " &&\n\t" constructors ) } $out/bin/constructors.sh &&
-                                                                        makeWrapper $out/bin/constructors.sh $out/bin/constructors.wrapped.sh --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set MKDIR ${ pkgs.coreutils }/bin/mkdir --set OUT $out
+                                                                        ${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.writeShellScript "constructors" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "source ${ _environment-variable "MAKE_WRAPPER" }/nix-support/setup-hook" ] constructor ] ) ) } $out/bin/constructor.sh &&
+                                                                        makeWrapper $out/bin/constructor.sh $out/bin/constructor.wrapped.sh --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set MKDIR ${ pkgs.coreutils }/bin/mkdir --set OUT $out
                                                                 '' ;
                                                     name = "derivation" ;
                                                     nativeBuildInputs = [ pkgs.makeWrapper ] ;
@@ -81,7 +99,7 @@
                                                     _visitor
                                                         {
                                                             lambda =
-                                                                path : value : derivation :
+                                                                path : value : ignore :
                                                                     value
                                                                         {
                                                                             shell-script =
@@ -136,12 +154,34 @@
                                             } ;
                                     in
                                         {
-
+                                            derivation = derivation ;
                                         } ;
                                 pkgs = builtins.import nixpkgs { system = system ; } ;
                             in
                                 {
-                                    checks = { } ;
+                                    apps =
+                                        {
+                                            foobar =
+                                                {
+                                                    type = "program" ;
+                                                    program = "${ pkgs.coreutils }/bin/echo ${ foobar.derivation }" ;
+                                                } ;
+                                        } ;
+                                    checks =
+                                        {
+                                            foobar =
+                                                pkgs.stdenv.mkDerivation
+                                                    {
+                                                        installPhase =
+                                                            ''
+                                                                ${ pkgs.coreutils }/bin/touch $out &&
+                                                                    ${ pkgs.coreutils }/bin/echo ${ foobar.derivation } &&
+                                                                    exit 64
+                                                            '' ;
+                                                        name = "foobar" ;
+                                                        src = ./. ;
+                                                    } ;
+                                        } ;
                                     lib = lib ;
                                 } ;
                 in flake-utils.lib.eachDefaultSystem fun ;
