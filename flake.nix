@@ -36,6 +36,7 @@
                                                                             ( string "YQ" "${ pkgs.yq }/bin/yq" )
                                                                         ] ;
                                                                 script = self + "/scripts/foobar.sh" ;
+                                                                tests = { } ;
                                                             } ;
                                                 noop =
                                                     { shell-script , ... } :
@@ -47,6 +48,7 @@
                                                                             ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
                                                                         ] ;
                                                                 script = self + "/scripts/noop.sh" ;
+                                                                tests = { } ;
                                                             } ;
                                             } ;
                                     } ;
@@ -209,7 +211,7 @@
                                                                                 path : value :
                                                                                     let
                                                                                         point = value null ;
-                                                                                        in [ ] ; # [ "${ _environment-variable "LN" } --symbolic ${ point.tests } ${ _environment-variable "OUT" }/${ builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) }" ] ;
+                                                                                        in [ "${ _environment-variable "LN" } --symbolic ${ point.tests } ${ _environment-variable "OUT" }/${ builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) }" ] ;
                                                                             null = path : value : [ ] ;
                                                                         }
                                                                         {
