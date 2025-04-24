@@ -4,9 +4,9 @@
             environment-variable.url = "github:viktordanek/environment-variable" ;
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
-            shell-script.url = "github:viktordanek/shell-script/issue/47-new-imple" ;
-            temporary.url = "github:viktordanek/temporary/issue/60-new-implementation-1" ;
-            visitor.url = "github:viktordanek/visitor" ;
+            shell-script.url = "github:viktordanek/shell-script/scratch/b6bb8f5b-7d48-4542-810c-58b5e36a3b0a" ;
+            temporary.url = "github:viktordanek/temporary/scratch/a18c0641-110a-4e3b-9261-260b8737c8b8" ;
+            visitor.url = "github:viktordanek/visitor/scratch/1bd1c881-b72b-43d7-a819-f6072a9dfdf7" ;
         } ;
     outputs =
         { environment-variable , flake-utils , nixpkgs , self , shell-script , temporary , visitor } :
@@ -26,10 +26,10 @@
                                                         shell-script
                                                             {
                                                                 profile =
-                                                                    { path , shell-script , string } :
+                                                                    { path , string } :
                                                                         [
                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
-                                                                            ( shell-script "NOOP" ( shell-scripts : shell-scripts.noop ) )
+                                                                            # ( shell-script "NOOP" ( shell-scripts : shell-scripts.noop ) )
                                                                             ( path "PATH_VALUE" 0 )
                                                                             ( string "STRING_VALUE" "a1895e773961f633c7c6178a7fda16f8d630cfcbc911080c7c8ec713dd882b8b5152abcc22c40b324c8b5df01070ba57348c02788cb07b31464fcba309036d1c" )
                                                                             ( string "TEMPLATE_FILE" ( self + "/scripts/foobar.json" ) )
@@ -77,8 +77,6 @@
                                                                                 [
                                                                                     "makeWrapper ${ let x = value "${ _environment-variable "OUT" }" ; in x.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh"
                                                                                 ] ;
-                                                                    }
-                                                                    {
                                                                         list = path : list : builtins.concatLists list ;
                                                                         set = path : set : builtins.concatLists ( builtins.attrValues set ) ;
                                                                     }
@@ -141,26 +139,25 @@
                                                                                                                                         } ;
                                                                                                                                     value = builtins.elemAt path point.index ;
                                                                                                                                     in "export ${ point.name }=${ builtins.toString value }" ;
-                                                                                                                        shell-script =
-                                                                                                                            name : fun :
-                                                                                                                                let
-                                                                                                                                    point =
-                                                                                                                                        {
-                                                                                                                                            fun =
-                                                                                                                                                if builtins.typeOf fun == "lambda" then fun
-                                                                                                                                                else builtins.throw "fun is not lambda but ${ builtins.typeOf fun }." ;
-                                                                                                                                            name =
-                                                                                                                                                if builtins.typeOf name == "string" then name
-                                                                                                                                                else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
-                                                                                                                                        } ;
-                                                                                                                                    shell-scripts =
-                                                                                                                                        _visitor
-                                                                                                                                            {
-                                                                                                                                                lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
-                                                                                                                                            }
-                                                                                                                                            { }
-                                                                                                                                            primary.shell-scripts ;
-                                                                                                                                    in "export ${ point.name }=${ point.fun shell-scripts }" ;
+                                                                                                                        # shell-script =
+                                                                                                                        #     name : fun :
+                                                                                                                        #         let
+                                                                                                                        #             point =
+                                                                                                                        #                 {
+                                                                                                                        #                     fun =
+                                                                                                                        #                         if builtins.typeOf fun == "lambda" then fun
+                                                                                                                        #                        else builtins.throw "fun is not lambda but ${ builtins.typeOf fun }." ;
+                                                                                                                        #                     name =
+                                                                                                                        #                         if builtins.typeOf name == "string" then name
+                                                                                                                        #                         else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
+                                                                                                                        #                 } ;
+                                                                                                                        #             shell-scripts =
+                                                                                                                        #                 _visitor
+                                                                                                                        #                     {
+                                                                                                                        #                         lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
+                                                                                                                        #                     }
+                                                                                                                        #                     primary.shell-scripts ;
+                                                                                                                        #             in "export ${ point.name }=${ point.fun shell-scripts }" ;
                                                                                                                         string =
                                                                                                                             name : value :
                                                                                                                                 let
@@ -190,7 +187,6 @@
                                                                             #    } ;
                                                                         } ;
                                                         }
-                                                        { }
                                                         shell-scripts ;
                                             } ;
                                     in
@@ -201,92 +197,71 @@
                                                     {
                                                         lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
                                                     }
-                                                    { }
                                                     primary.shell-scripts ;
                                             tests =
                                                 pkgs.stdenv.mkDerivation
                                                     {
                                                         installPhase =
                                                             let
-                                                                all =
-                                                                    _visitor
-                                                                        {
-                                                                            lambda = path : value : 1 ;
-                                                                            null = path : value : 0 ;
-                                                                        }
-                                                                        {
-                                                                            list = path : list : builtins.foldl' ( previous : current : previous + current ) 0 list ;
-                                                                            set = path : set : builtins.foldl' ( previous : current : previous + current ) 0 ( builtins.attrValues set ) ;
-                                                                        }
-                                                                        primary.shell-scripts ;
                                                                 constructor =
-                                                                    _visitor
-                                                                        {
-                                                                            lambda =
-                                                                                path : value :
-                                                                                    let
-                                                                                        point = value ( _environment-variable "OUT" ) ;
-                                                                                        in [ "${ _environment-variable "LN" } --symbolic ${ point.tests } ${ _environment-variable "OUT" }/${ builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) }" ] ;
-                                                                            null = path : value : [ ] ;
-                                                                        }
-                                                                        {
-                                                                            list = path : list : builtins.concatLists list ;
-                                                                            set = path : set : builtins.concatLists ( builtins.attrValues set ) ;
-                                                                        }
-                                                                        primary.shell-scripts ;
+                                                                    builtins.concatStringsSep
+                                                                        " &&\n\t"
+                                                                        [
+
+                                                                        ] ;
                                                                 metrics =
                                                                     _visitor
                                                                         {
                                                                             lambda =
                                                                                 path : value :
                                                                                     let
-                                                                                        point = value "${ _environment-variable "OUT" }" ;
+                                                                                        delayed = builtins.pathExists "${ point.tests }/DELAYED" && ! ( builtins.pathExists "${ point.tests }/ERROR" || builtins.pathExists "${ point.test }/FAILURE" || builtins.pathExists "${ point.tests }/SUCCESS" ) ;
+                                                                                        failure = builtins.pathExists "${ point.tests }/FAILURE" && ! ( builtins.pathExists "${ point.tests }/DELAYED" || builtins.pathExists "${ point.test }/FAILURE" || builtins.pathExists "${ point.tests }/SUCCESS" ) ;
+                                                                                        no = [ ] ;
+                                                                                        point = value null ;
+                                                                                        success = builtins.pathExists "${ point.tests }/SUCCESS" && ! ( builtins.pathExists "${ point.tests }/DELAYED" || builtins.pathExists "${ point.tests }/ERROR" || builtins.pathExists "${ point.tests }/FAILURE" ) ;
+                                                                                        yes = [ { path = path ; value = point ; } ] ;
                                                                                         in
                                                                                             {
-                                                                                                all = [ point ] ;
-                                                                                                delayed = if builtins.pathExists "${ point.tests }/DELAYED" then [ point ] else [ ] ;
-                                                                                                failure = if builtins.pathExists "${ point.tests }/FAILURE" then [ point ] else [ ] ;
-                                                                                                success = if builtins.pathExists "${ point.tests }/SUCCESS" then [ point ] else [ ] ;
+                                                                                                all = yes ;
+                                                                                                delayed = if delayed then yes else no ;
+                                                                                                error = if ! ( delayed || failure || success ) then yes else no ;
+                                                                                                failure = if failure then yes else no ;
+                                                                                                success = if success then yes else no ;
                                                                                             } ;
-                                                                            null = path : value : { all = 0 ; delayed = 0 ; failure = 0 ; success = 0 ; } ;
-                                                                        }
-                                                                        (
-                                                                            let
-                                                                                reducer =
-                                                                                    previous : current :
-                                                                                        {
-                                                                                            all = builtins.concatLists [ previous.all current.all ] ;
-                                                                                            delayed = builtins.concatLists [ previous.delayed current.delayed ] ;
-                                                                                            failure = builtins.concatLists [ previous.failure current.failure ] ;
-                                                                                            success = builtins.concaLists [ previous.success current.success ] ;
-                                                                                        } ;
-                                                                                in
+                                                                            null =
+                                                                                    path : value :
                                                                                     {
-                                                                                        list = path : list : builtins.foldl' reducer 0 list ;
-                                                                                        set = path : set : builtins.foldl' reducer 0 ( builtins.attrValues set ) ;
-                                                                                    }
-                                                                        )
-                                                                        primary.shell-scripts ;
-                                                                success =
-                                                                    _visitor
-                                                                        {
-                                                                            lambda =
-                                                                                path : value :
-                                                                                    let
-                                                                                        point = value "${ _environment-variable "OUT" }" ;
-                                                                                        in if builtins.pathExists "${ point.tests }/SUCCESS" then 1 else 0 ;
-                                                                            null = path : value : 0 ;
-                                                                        }
-                                                                        {
-                                                                            list = path : list : builtins.foldl' ( previous : current : previous + current ) 0 list ;
-                                                                            set = path : set : builtins.foldl' ( previous : current : previous + current ) 0 ( builtins.attrValues set ) ;
+                                                                                        all = [ ] ;
+                                                                                        delayed = [ ] ;
+                                                                                        error = [ ] ;
+                                                                                        failure = [ ] ;
+                                                                                        success = [ ] ;
+                                                                                    } ;
+                                                                            list =
+                                                                                path : list :
+                                                                                    {
+                                                                                        all = builtins.concatLists ( builtins.map ( l : l.all ) list ) ;
+                                                                                        delayed = builtins.concatLists ( builtins.map ( l : l.delayed ) list ) ;
+                                                                                        error = builtins.concatLists ( builtins.map ( l : l.error ) list ) ;
+                                                                                        failure = builtins.concatLists ( builtins.map ( l : l.failure ) list ) ;
+                                                                                        success = builtins.concatLists ( builtins.map ( l : l.success ) list ) ;
+                                                                                    } ;
+                                                                            set =
+                                                                                path : set :
+                                                                                    {
+                                                                                        all = builtins.concatLists ( builtins.attrValues ( builtins.mapAttrs ( name : value : value.all ) set ) ) ;
+                                                                                        delayed = builtins.concatLists ( builtins.attrValues ( builtins.mapAttrs ( name : value : value.delayed ) set ) ) ;
+                                                                                        error = builtins.concatLists ( builtins.attrValues ( builtins.mapAttrs ( name : value : value.error ) set ) ) ;
+                                                                                        failure = builtins.concatLists ( builtins.attrValues ( builtins.mapAttrs ( name : value : value.failure ) set ) ) ;
+                                                                                        success = builtins.concatLists ( builtins.attrValues ( builtins.mapAttrs ( name : value : value.success ) set ) ) ;
+                                                                                    } ;
                                                                         }
                                                                         primary.shell-scripts ;
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/mkdir $out &&
-                                                                            ${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.writeShellScript "constructor.sh" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "source ${ _environment-variable "MAKE_WRAPPER" }/nix-support/setup-hook" ] constructor ] ) ) } $out/constructor.sh &&
-                                                                            makeWrapper $out/constructor.sh $out/constructor.wrapped.sh --set LN ${ pkgs.coreutils }/bin/ln --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set OUT $out &&
+                                                                            makeWrapper ${ pkgs.writeShellScript "constructor.sh" constructor } $out/constructor.wrapped.sh --set LN ${ pkgs.coreutils }/bin/ln --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set OUT $out &&
                                                                             $out/constructor.wrapped.sh &&
                                                                             ${ pkgs.coreutils }/bin/echo ${ builtins.toJSON metrics } > $out/metrics.json
                                                                     '' ;
