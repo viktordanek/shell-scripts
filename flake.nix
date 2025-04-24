@@ -208,6 +208,17 @@
                                                     {
                                                         installPhase =
                                                             let
+                                                                all =
+                                                                    _visitor
+                                                                        {
+                                                                            lambda = path : value : 1 ;
+                                                                            null = path : value : 0 ;
+                                                                        }
+                                                                        {
+                                                                            list = path : list : builtins.foldl' ( previous : current : previous + current ) 0 list ;
+                                                                            set = path : set : builtins.foldl' ( previous : current : previous + current ) 0 ( builtins.attrValues set ) ;
+                                                                        }
+                                                                        primary.shell-scripts ;
                                                                 constructor =
                                                                     _visitor
                                                                         {
@@ -223,12 +234,61 @@
                                                                             set = path : set : builtins.concatLists ( builtins.attrValues set ) ;
                                                                         }
                                                                         primary.shell-scripts ;
+                                                                metrics =
+                                                                    _visitor
+                                                                        {
+                                                                            lambda =
+                                                                                path : value :
+                                                                                    let
+                                                                                        point = value "${ _environment-variable "OUT" }" ;
+                                                                                        in
+                                                                                            {
+                                                                                                all = [ point ] ;
+                                                                                                delayed = if builtins.pathExists "${ point.tests }/DELAYED" then [ point ] else [ ] ;
+                                                                                                failure = if builtins.pathExists "${ point.tests }/FAILURE" then [ point ] else [ ] ;
+                                                                                                success = if builtins.pathExists "${ point.tests }/SUCCESS" then [ point ] else [ ] ;
+                                                                                            } ;
+                                                                            null = path : value : { all = 0 ; delayed = 0 ; failure = 0 ; success = 0 ; } ;
+                                                                        }
+                                                                        (
+                                                                            let
+                                                                                reducer =
+                                                                                    previous : current :
+                                                                                        {
+                                                                                            all = builtins.concatLists [ previous.all current.all ] ;
+                                                                                            delayed = builtins.concatLists [ previous.delayed current.delayed ] ;
+                                                                                            failure = builtins.concatLists [ previous.failure current.failure ] ;
+                                                                                            success = builtins.concaLists [ previous.success current.success ] ;
+                                                                                        } ;
+                                                                                in
+                                                                                    {
+                                                                                        list = path : list : builtins.foldl' reducer 0 list ;
+                                                                                        set = path : set : builtins.foldl' reducer 0 ( builtins.attrValues set ) ;
+                                                                                    }
+                                                                        )
+                                                                        primary.shell-scripts ;
+                                                                success =
+                                                                    _visitor
+                                                                        {
+                                                                            lambda =
+                                                                                path : value :
+                                                                                    let
+                                                                                        point = value "${ _environment-variable "OUT" }" ;
+                                                                                        in if builtins.pathExists "${ point.tests }/SUCCESS" then 1 else 0 ;
+                                                                            null = path : value : 0 ;
+                                                                        }
+                                                                        {
+                                                                            list = path : list : builtins.foldl' ( previous : current : previous + current ) 0 list ;
+                                                                            set = path : set : builtins.foldl' ( previous : current : previous + current ) 0 ( builtins.attrValues set ) ;
+                                                                        }
+                                                                        primary.shell-scripts ;
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/mkdir $out &&
                                                                             ${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.writeShellScript "constructor.sh" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "source ${ _environment-variable "MAKE_WRAPPER" }/nix-support/setup-hook" ] constructor ] ) ) } $out/constructor.sh &&
                                                                             makeWrapper $out/constructor.sh $out/constructor.wrapped.sh --set LN ${ pkgs.coreutils }/bin/ln --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set OUT $out &&
-                                                                            $out/constructor.wrapped.sh
+                                                                            $out/constructor.wrapped.sh &&
+                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.toJSON metrics } > $out/metrics.json
                                                                     '' ;
                                                         name = "tests" ;
                                                         nativeBuildInputs = [ pkgs.makeWrapper ] ;
