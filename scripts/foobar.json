@@ -1,5 +1,6 @@
 {
     "arguments" : env.ARGUMENTS_VALUE ,
     "path" : env.PATH_VALUE,
+    "singleop" : env.SINGLEOP_VALUE ,
     "string" : env.STRING_VALUE
 }

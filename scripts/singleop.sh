@@ -1,0 +1,1 @@
+${ECHO} > ${STANDARD_OUTPUT}

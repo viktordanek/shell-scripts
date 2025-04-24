@@ -1,3 +1,3 @@
 export ARGUMENTS_VALUE=${@} &&
-  ${NOOP} &&
+  export SINGLEOP_VALUE=$( ${SINGLEOP} ) &&
   ${JQ} -n -f ${TEMPLATE_FILE} | ${YQ} --yaml-output

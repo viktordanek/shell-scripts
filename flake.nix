@@ -29,8 +29,8 @@
                                                                     { path , shell-script , string } :
                                                                         [
                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
-                                                                            ( shell-script "NOOP" ( shell-scripts : shell-scripts.noop ) )
                                                                             ( path "PATH_VALUE" 0 )
+                                                                            ( shell-script "SINGLEOP" ( shell-scripts : shell-scripts.singleop ) )
                                                                             ( string "STRING_VALUE" "a1895e773961f633c7c6178a7fda16f8d630cfcbc911080c7c8ec713dd882b8b5152abcc22c40b324c8b5df01070ba57348c02788cb07b31464fcba309036d1c" )
                                                                             ( string "TEMPLATE_FILE" ( self + "/scripts/foobar.json" ) )
                                                                             ( string "YQ" "${ pkgs.yq }/bin/yq" )
@@ -52,6 +52,19 @@
                                                                             ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
                                                                         ] ;
                                                                 script = self + "/scripts/noop.sh" ;
+                                                                tests = { } ;
+                                                            } ;
+                                                singleop =
+                                                    { shell-script , ... } :
+                                                        shell-script
+                                                            {
+                                                                profile =
+                                                                    { string , ... } :
+                                                                        [
+                                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                            ( string "STANDARD_OUTPUT" "c9d2c2560dc2693fc39549d8272aa6d134c6e7f3920b44b396ed2bd9b4e2d116061cfba9e4c9ddb80cc9b24864df5c103eb3c890fafe02dbe226ea9c9608e7f9" )
+                                                                        ] ;
+                                                                script = self + "/scripts/singleop.sh" ;
                                                                 tests = { } ;
                                                             } ;
                                             } ;
