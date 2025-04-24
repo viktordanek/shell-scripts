@@ -75,7 +75,11 @@
                                                                         lambda =
                                                                             path : value :
                                                                                 [
-                                                                                    "makeWrapper ${ let x = value "${ _environment-variable "OUT" }" ; in x.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh"
+                                                                                    (
+                                                                                        let
+                                                                                            point = value "d1bcf8c63e8bf82e747931fe38bb4e159722642009dd5c4c38584cef7e4bda536410e98ec6e4fbb6211b60a77fa84410ca437490e5aec93490de1fd0c8d0f342" ;
+                                                                                            in "makeWrapper ${ point.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh"
+                                                                                    )
                                                                                 ] ;
                                                                         list = path : list : builtins.concatLists list ;
                                                                         set = path : set : builtins.concatLists ( builtins.attrValues set ) ;
@@ -146,7 +150,7 @@
                                                                                                                                         {
                                                                                                                                             fun =
                                                                                                                                                 if builtins.typeOf fun == "lambda" then fun
-                                                                                                                                               else builtins.throw "fun is not lambda but ${ builtins.typeOf fun }." ;
+                                                                                                                                                else builtins.throw "fun is not lambda but ${ builtins.typeOf fun }." ;
                                                                                                                                             name =
                                                                                                                                                 if builtins.typeOf name == "string" then name
                                                                                                                                                 else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
@@ -154,7 +158,7 @@
                                                                                                                                     shell-scripts =
                                                                                                                                         _visitor
                                                                                                                                             {
-                                                                                                                                                lambda = path : value : "WRONG/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
+                                                                                                                                                lambda = path : value : "${ derivation }/WRONG/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
                                                                                                                                             }
                                                                                                                                             primary.shell-scripts ;
                                                                                                                                     in "export ${ point.name }=${ point.fun shell-scripts }" ;
@@ -218,7 +222,7 @@
                                                                                         delayed = builtins.pathExists "${ point.tests }/DELAYED" && ! ( builtins.pathExists "${ point.tests }/ERROR" || builtins.pathExists "${ point.tests }/FAILURE" || builtins.pathExists "${ point.tests }/SUCCESS" ) ;
                                                                                         failure = builtins.pathExists "${ point.tests }/FAILURE" && ! ( builtins.pathExists "${ point.tests }/DELAYED" || builtins.pathExists "${ point.tests }/FAILURE" || builtins.pathExists "${ point.tests }/SUCCESS" ) ;
                                                                                         no = [ ] ;
-                                                                                        point = value null ;
+                                                                                        point = value derivation ;
                                                                                         success = builtins.pathExists "${ point.tests }/SUCCESS" && ! ( builtins.pathExists "${ point.tests }/DELAYED" || builtins.pathExists "${ point.tests }/ERROR" || builtins.pathExists "${ point.tests }/FAILURE" ) ;
                                                                                         yes = [ { path = path ; value = point ; } ] ;
                                                                                         in
