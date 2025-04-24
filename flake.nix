@@ -77,7 +77,7 @@
                                                                                 [
                                                                                     (
                                                                                         let
-                                                                                            point = value ( _environment-variable "OUT" ) ;
+                                                                                            point = value ( "e0bcfce88b988b531eb3c159362b39db7ff011cf628573e94528f8579ea4446a9fb901743119ec8150e927dc5418c224992685ed436a0617a0b352885cd281a2" ) ;
                                                                                             in "makeWrapper ${ point.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh"
                                                                                     )
                                                                                 ] ;
