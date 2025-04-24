@@ -78,7 +78,7 @@
                                                                                     (
                                                                                         let
                                                                                             point = value ( _environment-variable "OUT" ) ;
-                                                                                            in "makeWrapper ${ point.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh --set OUT ${ builtins.placeholder "out" }"
+                                                                                            in "makeWrapper ${ point.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh --set OUT ${ _environment-variable "OUT" }"
                                                                                     )
                                                                                 ] ;
                                                                         list = path : list : builtins.concatLists list ;
