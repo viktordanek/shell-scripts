@@ -77,7 +77,7 @@
                                                                                 [
                                                                                     (
                                                                                         let
-                                                                                            point = value "d1bcf8c63e8bf82e747931fe38bb4e159722642009dd5c4c38584cef7e4bda536410e98ec6e4fbb6211b60a77fa84410ca437490e5aec93490de1fd0c8d0f342" ;
+                                                                                            point = value ( _environment-variable "OUT" ) ;
                                                                                             in "makeWrapper ${ point.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh"
                                                                                     )
                                                                                 ] ;
@@ -90,7 +90,7 @@
                                                                     ${ pkgs.coreutils }/bin/mkdir $out &&
                                                                         ${ pkgs.coreutils }/bin/mkdir $out/bin
                                                                         ${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.writeShellScript "constructors" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "source ${ _environment-variable "MAKE_WRAPPER" }/nix-support/setup-hook" ] constructor ] ) ) } $out/bin/constructor.sh &&
-                                                                        makeWrapper $out/bin/constructor.sh $out/bin/constructor.wrapped.sh --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set MKDIR ${ pkgs.coreutils }/bin/mkdir --set OUT $out &&
+                                                                        makeWrapper $out/bin/constructor.sh $out/bin/constructor.wrapped.sh --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set MKDIR ${ pkgs.coreutils }/bin/mkdir --set OUT 4ce941bb2dda325aaa959ff99de28872815961da38996a49e052ede5ac7c53b837e11cbeedc55b327a6d775b996dac3d255b691d45df9bcf6e7a8e532e2e3c6c &&
                                                                         $out/bin/constructor.wrapped.sh
                                                                 '' ;
                                                     name = "derivation" ;
