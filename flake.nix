@@ -26,7 +26,7 @@
                                                         shell-script
                                                             {
                                                                 profile =
-                                                                    { path , string } :
+                                                                    { path , shell-script , string } :
                                                                         [
                                                                             ( string "JQ" "${ pkgs.jq }/bin/jq" )
                                                                             # ( shell-script "NOOP" ( shell-scripts : shell-scripts.noop ) )
@@ -139,25 +139,25 @@
                                                                                                                                         } ;
                                                                                                                                     value = builtins.elemAt path point.index ;
                                                                                                                                     in "export ${ point.name }=${ builtins.toString value }" ;
-                                                                                                                        # shell-script =
-                                                                                                                        #     name : fun :
-                                                                                                                        #         let
-                                                                                                                        #             point =
-                                                                                                                        #                 {
-                                                                                                                        #                     fun =
-                                                                                                                        #                         if builtins.typeOf fun == "lambda" then fun
-                                                                                                                        #                        else builtins.throw "fun is not lambda but ${ builtins.typeOf fun }." ;
-                                                                                                                        #                     name =
-                                                                                                                        #                         if builtins.typeOf name == "string" then name
-                                                                                                                        #                         else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
-                                                                                                                        #                 } ;
-                                                                                                                        #             shell-scripts =
-                                                                                                                        #                 _visitor
-                                                                                                                        #                     {
-                                                                                                                        #                         lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
-                                                                                                                        #                     }
-                                                                                                                        #                     primary.shell-scripts ;
-                                                                                                                        #             in "export ${ point.name }=${ point.fun shell-scripts }" ;
+                                                                                                                        shell-script =
+                                                                                                                            name : fun :
+                                                                                                                                let
+                                                                                                                                    point =
+                                                                                                                                        {
+                                                                                                                                            fun =
+                                                                                                                                                if builtins.typeOf fun == "lambda" then fun
+                                                                                                                                               else builtins.throw "fun is not lambda but ${ builtins.typeOf fun }." ;
+                                                                                                                                            name =
+                                                                                                                                                if builtins.typeOf name == "string" then name
+                                                                                                                                                else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
+                                                                                                                                        } ;
+                                                                                                                                    shell-scripts =
+                                                                                                                                        _visitor
+                                                                                                                                            {
+                                                                                                                                                lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
+                                                                                                                                            }
+                                                                                                                                            primary.shell-scripts ;
+                                                                                                                                    in "export ${ point.name }=${ point.fun shell-scripts }" ;
                                                                                                                         string =
                                                                                                                             name : value :
                                                                                                                                 let
