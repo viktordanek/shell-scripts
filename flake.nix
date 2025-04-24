@@ -289,6 +289,7 @@
                                                         installPhase =
                                                             ''
                                                                 ${ pkgs.coreutils }/bin/touch $out &&
+                                                                    ${ pkgs.coreutils }/bin/echo ${ foobar.shell-scripts.foobar } &&
                                                                     ${ pkgs.coreutils }/bin/echo ${ foobar.tests } &&
                                                                     exit 64
                                                             '' ;
