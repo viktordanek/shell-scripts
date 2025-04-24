@@ -154,10 +154,10 @@
                                                                                                                                     shell-scripts =
                                                                                                                                         _visitor
                                                                                                                                             {
-                                                                                                                                                lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
+                                                                                                                                                lambda = path : value : "WRONG/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
                                                                                                                                             }
                                                                                                                                             primary.shell-scripts ;
-                                                                                                                                    in "export ${ point.name }=WTF" ;
+                                                                                                                                    in "export ${ point.name }=${ point.fun shell-scripts }" ;
                                                                                                                         string =
                                                                                                                             name : value :
                                                                                                                                 let
