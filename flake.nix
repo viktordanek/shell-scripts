@@ -158,7 +158,7 @@
                                                                                                                                     shell-scripts =
                                                                                                                                         _visitor
                                                                                                                                             {
-                                                                                                                                                lambda = path : value : "${ derivation }/WRONG/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
+                                                                                                                                                lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
                                                                                                                                             }
                                                                                                                                             primary.shell-scripts ;
                                                                                                                                     in "export ${ point.name }=${ point.fun shell-scripts }" ;
