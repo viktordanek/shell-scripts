@@ -205,6 +205,7 @@
                                                                                                 ) ;
                                                                                         report =
                                                                                             {
+                                                                                                is-temporary-init = false ;
                                                                                                 value = eval.value ;
                                                                                             } ;
                                                                                         in if eval.success then report else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
