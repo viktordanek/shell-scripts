@@ -67,6 +67,12 @@
                                                                 script = self + "/scripts/singleop.sh" ;
                                                                 tests = { } ;
                                                             } ;
+                                                temporary =
+                                                    { temporary , ... } :
+                                                        temporary
+                                                            {
+
+                                                            } ;
                                             } ;
                                     } ;
                             lib =
@@ -198,10 +204,33 @@
                                                                                                         in _shell-script arguments
                                                                                                 ) ;
                                                                                         in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
-                                                                            # temporary =
-                                                                            #     {
-                                                                            #
-                                                                            #    } ;
+                                                                            temporary =
+                                                                                {
+                                                                                    init ? null ,
+                                                                                    post ? null ,
+                                                                                    release ? null
+                                                                                } :
+                                                                                    let
+                                                                                        eval =
+                                                                                            builtins.tryEval
+                                                                                                (
+                                                                                                    let
+                                                                                                        _temporary = builtins.getAttr system temporary.lib ;
+                                                                                                        arguments =
+                                                                                                            {
+                                                                                                                init =
+                                                                                                                    if builtins.typeOf init == "lambda" then init
+                                                                                                                    else init ;
+                                                                                                                post =
+                                                                                                                    if builtins.typeOf post == "lambda" then post
+                                                                                                                    else post ;
+                                                                                                                release =
+                                                                                                                    if builtins.typeOf release == "lambda" then release
+                                                                                                                    else release ;
+                                                                                                            } ;
+                                                                                                        in _temporary arguments
+                                                                                                ) ;
+                                                                                        in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
                                                                         } ;
                                                         }
                                                         shell-scripts ;
