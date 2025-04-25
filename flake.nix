@@ -83,6 +83,18 @@
                                                                                 ${ _environment-variable "MKDIR" } /mount/target
                                                                             '' ;
                                                                     } ;
+                                                                release =
+                                                                    {
+                                                                        profile =
+                                                                            { string , ... } :
+                                                                                [
+                                                                                    ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                                                ] ;
+                                                                        script =
+                                                                            ''
+                                                                                ${ _environment-variable "CP" } /resources /release
+                                                                            '' ;
+                                                                    } ;
                                                             } ;
                                             } ;
                                     } ;
