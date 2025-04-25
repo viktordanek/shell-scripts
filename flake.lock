@@ -354,11 +354,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1745580203,
-        "narHash": "sha256-5Wd0TOjSe4TzWFWMrBWmGvuTORp3kZ1uGBUlRbtoBVY=",
+        "lastModified": 1745587760,
+        "narHash": "sha256-+8qYrDO5QbRjK++IkrKa03w42G+tV2KYjbSYl4iWO7Q=",
         "owner": "NixOs",
         "repo": "nixpkgs",
-        "rev": "b3c3fafec1b55e75193044cea031feb0f6c3877b",
+        "rev": "9ba8353cf865f66fe5e034183f2d3146fb0648ec",
         "type": "github"
       },
       "original": {
@@ -429,11 +429,11 @@
     },
     "nixpkgs_7": {
       "locked": {
-        "lastModified": 1745580203,
-        "narHash": "sha256-5Wd0TOjSe4TzWFWMrBWmGvuTORp3kZ1uGBUlRbtoBVY=",
+        "lastModified": 1745587760,
+        "narHash": "sha256-+8qYrDO5QbRjK++IkrKa03w42G+tV2KYjbSYl4iWO7Q=",
         "owner": "NixOs",
         "repo": "nixpkgs",
-        "rev": "b3c3fafec1b55e75193044cea031feb0f6c3877b",
+        "rev": "9ba8353cf865f66fe5e034183f2d3146fb0648ec",
         "type": "github"
       },
       "original": {
@@ -490,11 +490,11 @@
         "visitor": "visitor"
       },
       "locked": {
-        "lastModified": 1745579697,
-        "narHash": "sha256-UdMwGVoRLS/TFumzNnDjfIIPN+VTzHROYPu89MA7XYI=",
+        "lastModified": 1745587716,
+        "narHash": "sha256-HiTfFHhlf5nu750tr2BrOKkBlr+kjAcx5VnJ7TuWnqk=",
         "owner": "viktordanek",
         "repo": "shell-script",
-        "rev": "ee317499fee0e9438fa020f4995b57dd854facd4",
+        "rev": "ab08ed7d832a9cf847d0f5d7f3ca365d7d686b7f",
         "type": "github"
       },
       "original": {
@@ -512,11 +512,11 @@
         "visitor": "visitor_2"
       },
       "locked": {
-        "lastModified": 1745579697,
-        "narHash": "sha256-UdMwGVoRLS/TFumzNnDjfIIPN+VTzHROYPu89MA7XYI=",
+        "lastModified": 1745587716,
+        "narHash": "sha256-HiTfFHhlf5nu750tr2BrOKkBlr+kjAcx5VnJ7TuWnqk=",
         "owner": "viktordanek",
         "repo": "shell-script",
-        "rev": "ee317499fee0e9438fa020f4995b57dd854facd4",
+        "rev": "ab08ed7d832a9cf847d0f5d7f3ca365d7d686b7f",
         "type": "github"
       },
       "original": {
@@ -715,11 +715,11 @@
         "visitor": "visitor_3"
       },
       "locked": {
-        "lastModified": 1745580586,
-        "narHash": "sha256-XgCYntTe15Js7FNu4Kt74OStGq0xvafAZZ0DXu+fABA=",
+        "lastModified": 1745587926,
+        "narHash": "sha256-3vEXcfi/UoU2MCX1LKOXEvPlfeWXjFetLmRM5Bpohho=",
         "owner": "viktordanek",
         "repo": "temporary",
-        "rev": "8264cefb56444b317ba048dbb44c2aa6f9ccea1a",
+        "rev": "de532c60713b7a34395c6cdf6b3fe6588f4227f8",
         "type": "github"
       },
       "original": {

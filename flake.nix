@@ -71,7 +71,18 @@
                                                     { temporary , ... } :
                                                         temporary
                                                             {
-
+                                                                init =
+                                                                    {
+                                                                        profile =
+                                                                            { string , ... } :
+                                                                                [
+                                                                                    ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
+                                                                                ] ;
+                                                                        script =
+                                                                            ''
+                                                                                ${ _environment-variable "MKDIR" } /mount/target
+                                                                            '' ;
+                                                                    } ;
                                                             } ;
                                             } ;
                                     } ;
@@ -129,103 +140,117 @@
                                                             lambda =
                                                                 path : value : derivation :
                                                                     value
-                                                                        {
-                                                                            shell-script =
-                                                                                {
-                                                                                    mounts ? { } ,
-                                                                                    name ? if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ,
-                                                                                    profile ? { ... } : [ ] ,
-                                                                                    script ,
-                                                                                    tests ? null
-                                                                                } :
-                                                                                    let
-                                                                                        eval  =
-                                                                                            builtins.tryEval
-                                                                                                (
-                                                                                                    let
-                                                                                                        _shell-script = builtins.getAttr system shell-script.lib ;
-                                                                                                        arguments =
+                                                                        (
+                                                                            let
+                                                                                extensions =
+                                                                                    {
+                                                                                        path =
+                                                                                            name : index :
+                                                                                                let
+                                                                                                    point =
+                                                                                                        {
+                                                                                                            index =
+                                                                                                                if builtins.typeOf index == "int" then index
+                                                                                                                else builtins.throw "index is not int but ${ builtins.typeOf index }." ;
+                                                                                                            name =
+                                                                                                                if builtins.typeOf name == "string" then name
+                                                                                                                else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
+                                                                                                        } ;
+                                                                                                    value = builtins.elemAt path point.index ;
+                                                                                                    in "export ${ point.name }=${ builtins.toString value }" ;
+                                                                                        shell-script =
+                                                                                            name : fun :
+                                                                                                let
+                                                                                                    point =
+                                                                                                        {
+                                                                                                            fun =
+                                                                                                                if builtins.typeOf fun == "lambda" then fun
+                                                                                                                else builtins.throw "fun is not lambda but ${ builtins.typeOf fun }." ;
+                                                                                                            name =
+                                                                                                                if builtins.typeOf name == "string" then name
+                                                                                                                else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
+                                                                                                        } ;
+                                                                                                    shell-scripts =
+                                                                                                        _visitor
                                                                                                             {
-                                                                                                                extensions =
+                                                                                                                lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
+                                                                                                            }
+                                                                                                            primary.shell-scripts ;
+                                                                                                    in "export ${ point.name }=${ point.fun shell-scripts }" ;
+                                                                                        string =
+                                                                                            name : value :
+                                                                                                let
+                                                                                                    point =
+                                                                                                        {
+                                                                                                            name =
+                                                                                                                if builtins.typeOf name == "string" then name
+                                                                                                                else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
+                                                                                                            value =
+                                                                                                                if builtins.typeOf value == "string" then value
+                                                                                                                else builtins.throw "value is not string but ${ builtins.typeOf value }." ;
+                                                                                                        } ;
+                                                                                                    in "export ${ point.name }=${ point.value }" ;
+                                                                                    } ;
+                                                                                in
+                                                                                {
+                                                                                    shell-script =
+                                                                                        {
+                                                                                            mounts ? { } ,
+                                                                                            name ? if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ,
+                                                                                            profile ? { ... } : [ ] ,
+                                                                                            script ,
+                                                                                            tests ? null
+                                                                                        } :
+                                                                                            let
+                                                                                                eval  =
+                                                                                                    builtins.tryEval
+                                                                                                        (
+                                                                                                            let
+                                                                                                                _shell-script = builtins.getAttr system shell-script.lib ;
+                                                                                                                arguments =
                                                                                                                     {
-                                                                                                                        path =
-                                                                                                                            name : index :
-                                                                                                                                let
-                                                                                                                                    point =
-                                                                                                                                        {
-                                                                                                                                            index =
-                                                                                                                                                if builtins.typeOf index == "int" then index
-                                                                                                                                                else builtins.throw "index is not int but ${ builtins.typeOf index }." ;
-                                                                                                                                            name =
-                                                                                                                                                if builtins.typeOf name == "string" then name
-                                                                                                                                                else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
-                                                                                                                                        } ;
-                                                                                                                                    value = builtins.elemAt path point.index ;
-                                                                                                                                    in "export ${ point.name }=${ builtins.toString value }" ;
-                                                                                                                        shell-script =
-                                                                                                                            name : fun :
-                                                                                                                                let
-                                                                                                                                    point =
-                                                                                                                                        {
-                                                                                                                                            fun =
-                                                                                                                                                if builtins.typeOf fun == "lambda" then fun
-                                                                                                                                                else builtins.throw "fun is not lambda but ${ builtins.typeOf fun }." ;
-                                                                                                                                            name =
-                                                                                                                                                if builtins.typeOf name == "string" then name
-                                                                                                                                                else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
-                                                                                                                                        } ;
-                                                                                                                                    shell-scripts =
-                                                                                                                                        _visitor
-                                                                                                                                            {
-                                                                                                                                                lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
-                                                                                                                                            }
-                                                                                                                                            primary.shell-scripts ;
-                                                                                                                                    in "export ${ point.name }=${ point.fun shell-scripts }" ;
-                                                                                                                        string =
-                                                                                                                            name : value :
-                                                                                                                                let
-                                                                                                                                    point =
-                                                                                                                                        {
-                                                                                                                                            name =
-                                                                                                                                                if builtins.typeOf name == "string" then name
-                                                                                                                                                else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
-                                                                                                                                            value =
-                                                                                                                                                if builtins.typeOf value == "string" then value
-                                                                                                                                                else builtins.throw "value is not string but ${ builtins.typeOf value }." ;
-                                                                                                                                        } ;
-                                                                                                                                    in "export ${ point.name }=${ point.value }" ;
+                                                                                                                        extensions = extensions ;
+                                                                                                                        mounts = mounts ;
+                                                                                                                        name = name ;
+                                                                                                                        profile = profile ;
+                                                                                                                        script = script ;
+                                                                                                                        tests = tests ;
                                                                                                                     } ;
-                                                                                                                mounts = mounts ;
-                                                                                                                name = name ;
-                                                                                                                profile = profile ;
-                                                                                                                script = script ;
-                                                                                                                tests = tests ;
-                                                                                                            } ;
-                                                                                                        in _shell-script arguments
-                                                                                                ) ;
-                                                                                        in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
-                                                                            temporary =
-                                                                                {
-                                                                                    init ? null ,
-                                                                                    post ? null ,
-                                                                                    release ? null
-                                                                                } :
-                                                                                    let
-                                                                                        eval =
-                                                                                            builtins.tryEval
-                                                                                                (
-                                                                                                    let
-                                                                                                        _temporary = builtins.getAttr system temporary.lib ;
-                                                                                                        arguments =
-                                                                                                            {
-                                                                                                                init = init ;
-                                                                                                                post = post ;
-                                                                                                                release = release ;
-                                                                                                            } ;
-                                                                                                        in _temporary arguments
-                                                                                                ) ;
-                                                                                        in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
-                                                                        } ;
+                                                                                                                in _shell-script arguments
+                                                                                                        ) ;
+                                                                                                in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
+                                                                                    temporary =
+                                                                                        {
+                                                                                            init ? null ,
+                                                                                            post ? null ,
+                                                                                            release ? null
+                                                                                        } :
+                                                                                            let
+                                                                                                eval =
+                                                                                                    builtins.tryEval
+                                                                                                        (
+                                                                                                            let
+                                                                                                                _temporary = builtins.getAttr system temporary.lib ;
+                                                                                                                arguments =
+                                                                                                                    {
+                                                                                                                        init =
+                                                                                                                            if builtins.typeOf init == "set" then
+                                                                                                                                let
+                                                                                                                                    augment =
+                                                                                                                                        {
+                                                                                                                                            extensions = extensions ;
+                                                                                                                                            name = if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ;
+                                                                                                                                        } ;
+                                                                                                                                    in init // augment
+                                                                                                                            else init ;
+                                                                                                                        post = post ;
+                                                                                                                        release = release ;
+                                                                                                                    } ;
+                                                                                                                in _temporary arguments
+                                                                                                        ) ;
+                                                                                                in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
+                                                                                }
+                                                                        ) ;
                                                         }
                                                         shell-scripts ;
                                             } ;
