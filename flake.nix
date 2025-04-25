@@ -85,14 +85,23 @@
                                                                     } ;
                                                                 release =
                                                                     {
+                                                                        mounts =
+                                                                            {
+                                                                                "/release" =
+                                                                                    {
+                                                                                        host-path = _environment-variable "RELEASE" ;
+                                                                                        is-read-only = false ;
+                                                                                    } ;
+                                                                            } ;
                                                                         profile =
                                                                             { string , ... } :
                                                                                 [
                                                                                     ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                                                    ( string "TOUCH" "${ pkgs.coreutils }/bin/mkdir" )
                                                                                 ] ;
                                                                         script =
                                                                             ''
-                                                                                ${ _environment-variable "CP" } /resources /release
+                                                                                ${ _environment-variable "TOUCH" } /release/release
                                                                             '' ;
                                                                     } ;
                                                             } ;
