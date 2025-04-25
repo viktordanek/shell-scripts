@@ -232,20 +232,18 @@
                                                                                                             let
                                                                                                                 _temporary = builtins.getAttr system temporary.lib ;
                                                                                                                 arguments =
-                                                                                                                    {
-                                                                                                                        init =
-                                                                                                                            if builtins.typeOf init == "set" then
-                                                                                                                                let
-                                                                                                                                    augment =
-                                                                                                                                        {
-                                                                                                                                            extensions = extensions ;
-                                                                                                                                            name = if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ;
-                                                                                                                                        } ;
-                                                                                                                                    in init // augment
-                                                                                                                            else init ;
-                                                                                                                        post = post ;
-                                                                                                                        release = release ;
-                                                                                                                    } ;
+                                                                                                                    let
+                                                                                                                        augment =
+                                                                                                                            {
+                                                                                                                                extensions = extensions ;
+                                                                                                                                name = if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ;
+                                                                                                                            } ;
+                                                                                                                        in
+                                                                                                                            {
+                                                                                                                                init = if builtins.typeOf init == "set" then init // augment else init ;
+                                                                                                                                post = if builtins.typeOf post == "set" then post // augment else post ;
+                                                                                                                                release = if builtins.typeOf release == "set" then release // augment else release ;
+                                                                                                                            } ;
                                                                                                                 in _temporary arguments
                                                                                                         ) ;
                                                                                                 in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
