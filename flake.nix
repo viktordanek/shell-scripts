@@ -218,15 +218,9 @@
                                                                                                         _temporary = builtins.getAttr system temporary.lib ;
                                                                                                         arguments =
                                                                                                             {
-                                                                                                                init =
-                                                                                                                    if builtins.typeOf init == "lambda" then init
-                                                                                                                    else init ;
-                                                                                                                post =
-                                                                                                                    if builtins.typeOf post == "lambda" then post
-                                                                                                                    else post ;
-                                                                                                                release =
-                                                                                                                    if builtins.typeOf release == "lambda" then release
-                                                                                                                    else release ;
+                                                                                                                init = init ;
+                                                                                                                post = post ;
+                                                                                                                release = release ;
                                                                                                             } ;
                                                                                                         in _temporary arguments
                                                                                                 ) ;
