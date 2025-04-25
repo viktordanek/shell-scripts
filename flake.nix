@@ -83,6 +83,22 @@
                                                                                 ${ _environment-variable "MKDIR" } /mount/target
                                                                             '' ;
                                                                     } ;
+                                                                release =
+                                                                    {
+
+                                                                    } ;
+                                                                post =
+                                                                    {
+                                                                        mounts =
+                                                                            {
+                                                                                "/archive" =
+                                                                                    {
+                                                                                        host-path = _environment-variable "ARCHIVE" ;
+                                                                                        is-read-only = false ;
+                                                                                    } ;
+                                                                            } ;
+
+                                                                    } ;
                                                             } ;
                                             } ;
                                     } ;
