@@ -83,21 +83,45 @@
                                                                                 ${ _environment-variable "MKDIR" } /mount/target
                                                                             '' ;
                                                                     } ;
-                                                                release =
+                                                                post =
                                                                     {
-
+                                                                        mounts =
+                                                                            {
+                                                                                "/release" =
+                                                                                    {
+                                                                                        host-path = _environment-variable "RELEASE" ;
+                                                                                        is-read-only = false ;
+                                                                                    } ;
+                                                                            } ;
+                                                                        profile =
+                                                                            { string , ... } :
+                                                                                [
+                                                                                    ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                                                ] ;
+                                                                        script =
+                                                                            ''
+                                                                                ${ _environment-variable "CP" } --recursive /resource /release
+                                                                            '' ;
                                                                     } ;
                                                                 post =
                                                                     {
                                                                         mounts =
                                                                             {
-                                                                                "/archive" =
+                                                                                "/post" =
                                                                                     {
-                                                                                        host-path = _environment-variable "ARCHIVE" ;
+                                                                                        host-path = _environment-variable "POST" ;
                                                                                         is-read-only = false ;
                                                                                     } ;
                                                                             } ;
-
+                                                                        profile =
+                                                                            { string , ... } :
+                                                                                [
+                                                                                    ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                                                ] ;
+                                                                        script =
+                                                                            ''
+                                                                                ${ _environment-variable "CP" } --recursive /resource /post
+                                                                            '' ;
                                                                     } ;
                                                             } ;
                                             } ;
