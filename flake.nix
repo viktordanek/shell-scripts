@@ -96,7 +96,7 @@
                                                                                 [
                                                                                     (
                                                                                         let
-                                                                                            point = value ( _environment-variable "OUT" ) ;
+                                                                                            point = builtins.getAttr "value" ( value ( _environment-variable "OUT" ) ) ;
                                                                                             in "makeWrapper ${ point.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh --set OUT ${ _environment-variable "OUT" }"
                                                                                     )
                                                                                 ] ;
@@ -203,7 +203,10 @@
                                                                                                             } ;
                                                                                                         in _shell-script arguments
                                                                                                 ) ;
-                                                                                        report = eval.value ;
+                                                                                        report =
+                                                                                            {
+                                                                                                value = eval.value ;
+                                                                                            } ;
                                                                                         in if eval.success then report else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
                                                                             temporary =
                                                                                 {
@@ -325,7 +328,7 @@
                                                                                         delayed = builtins.pathExists "${ point.tests }/DELAYED" && ! ( builtins.pathExists "${ point.tests }/ERROR" || builtins.pathExists "${ point.tests }/FAILURE" || builtins.pathExists "${ point.tests }/SUCCESS" ) ;
                                                                                         failure = builtins.pathExists "${ point.tests }/FAILURE" && ! ( builtins.pathExists "${ point.tests }/DELAYED" || builtins.pathExists "${ point.tests }/ERROR" || builtins.pathExists "${ point.tests }/SUCCESS" ) ;
                                                                                         no = [ ] ;
-                                                                                        point = value derivation ;
+                                                                                        point = builtins.getAttr "value" ( value derivation ) ;
                                                                                         success = builtins.pathExists "${ point.tests }/SUCCESS" && ! ( builtins.pathExists "${ point.tests }/DELAYED" || builtins.pathExists "${ point.tests }/ERROR" || builtins.pathExists "${ point.tests }/FAILURE" ) ;
                                                                                         yes = [ { path = path ; value = point ; } ] ;
                                                                                         in
