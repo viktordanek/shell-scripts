@@ -224,7 +224,15 @@
                                                                     builtins.concatStringsSep
                                                                         " &&\n\t"
                                                                         [
-
+                                                                            (
+                                                                                let
+                                                                                    status =
+                                                                                        if builtins.length metrics.all == builtins.length metrics.success && builtins.length metrics.delayed == 0 && builtins.length metrics.error == 0 && builtins.length metrics.failure == 0 then "SUCCESS"
+                                                                                        else if builtins.length metrics.all == ( builtins.length metrics.success ) + ( builtins.length metrics.delayed ) && builtins.length metrics.error == 0 && builtins.length metrics.failure == 0 then "DELAYED"
+                                                                                        else if builtins.length metrics.all == ( builtins.length metrics.success ) + ( builtins.length metrics.delayed ) + ( builtins.length metrics.failure ) && builtins.length metrics.error == 0 then "FAILURE"
+                                                                                        else "ERROR" ;
+                                                                                    in "${ _environment-variable "TOUCH" } ${ _environment-variable "OUT" }/${ status }"
+                                                                            )
                                                                         ] ;
                                                                 metrics =
                                                                     _visitor
@@ -278,9 +286,9 @@
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/mkdir $out &&
-                                                                            makeWrapper ${ pkgs.writeShellScript "constructor.sh" constructor } $out/constructor.wrapped.sh --set LN ${ pkgs.coreutils }/bin/ln --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set OUT $out &&
+                                                                            makeWrapper ${ pkgs.writeShellScript "constructor.sh" constructor } $out/constructor.wrapped.sh --set ECHO ${ pkgs.coreutils }/bin/echo --set LN ${ pkgs.coreutils }/bin/ln --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set OUT $out --set TOUCH ${ pkgs.coreutils }/bin/touch &&
                                                                             $out/constructor.wrapped.sh &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.toJSON metrics } > $out/metrics.json
+                                                                            ${ pkgs.coreutils }/bin/echo '${ builtins.toJSON metrics }' | ${ pkgs.yq }/bin/yq --yaml-output > $out/metrics.yaml
                                                                     '' ;
                                                         name = "tests" ;
                                                         nativeBuildInputs = [ pkgs.makeWrapper ] ;
@@ -308,7 +316,21 @@
                                                                 ${ pkgs.coreutils }/bin/touch $out &&
                                                                     ${ pkgs.coreutils }/bin/echo ${ foobar.shell-scripts.foobar } &&
                                                                     ${ pkgs.coreutils }/bin/echo ${ foobar.tests } &&
-                                                                    exit 64
+                                                                    if [ -f ${ foobar.tests }/SUCCESS ]
+                                                                    then
+                                                                        ${ pkgs.coreutils }/bin/echo There was success in ${ foobar.tests }.
+                                                                    elif [ -f ${ foobar.tests }/DELAYED ]
+                                                                    then
+                                                                        ${ pkgs.coreutils }/bin/echo There was delay in ${ foobar.tests }. >&2 &&
+                                                                            exit 62
+                                                                    elif [ -f ${ foobar.tests }/FAILURE ]
+                                                                    then
+                                                                        ${ pkgs.coreutils }/bin/echo There was failure in ${ foobar.tests }. >&2 &&
+                                                                            exit 61
+                                                                    else
+                                                                        ${ pkgs.coreutils }/bin/echo There was error in ${ foobar.tests }. >&2 &&
+                                                                            exit 60
+                                                                    fi
                                                             '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;
