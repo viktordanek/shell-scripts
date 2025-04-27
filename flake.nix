@@ -314,7 +314,7 @@
                                                                                                         "${ value.tests }/observe.wrapped.sh"
                                                                                                         "${ _environment-variable "ECHO" } SUCCESS"
                                                                                                     ] ;
-                                                                                            in builtins.map mapper metrics.error ;
+                                                                                            in builtins.map mapper metrics.delayed ;
                                                                                     error =
                                                                                         let
                                                                                             mapper =
@@ -344,13 +344,13 @@
                                                                                             mapper =
                                                                                                 value :
                                                                                                     [
-                                                                                                        "${ _environment-variable "ECHO" }"
-                                                                                                        "${ _environment-variable "ECHO" } We are skipping ${ value.value.tests } because it was a SUCCESS"
-                                                                                                        "${ _environment-variable "ECHO" } ${ builtins.concatStringsSep " / " value.path }"
-                                                                                                        "${ _environment-variable "ECHO" } SUCCESS"
+                                                                                                        ''${ _environment-variable "ECHO" } "- path: ${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.concatStringsSep " / " value.path ) }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  status: SUCCESS"''
+                                                                                                        # ''${ _environment-variable "ECHO" } "  script: ${ value.value.shell-script }"''
+                                                                                                        # ''${ _environment-variable "ECHO" } "  tests: ${ value.value.tests }"''
                                                                                                     ] ;
-                                                                                            in builtins.map mapper metrics.error ;
-                                                                                    in "makeWrapper ${ pkgs.writeShellScript "observe.sh" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists ( builtins.concatLists [ error failure delayed success ] ) ) ) } ${ _environment-variable "OUT" }/observe.wrapped.sh --set ECHO ${ _environment-variable "ECHO" }"
+                                                                                            in builtins.map mapper metrics.success ;
+                                                                                    in "makeWrapper ${ pkgs.writeShellScript "observe.sh" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists ( builtins.concatLists [ success ] ) ) ) } ${ _environment-variable "OUT" }/observe.wrapped.sh --set ECHO ${ _environment-variable "ECHO" }"
                                                                             )
                                                                         ] ;
                                                                 metrics =
@@ -422,7 +422,7 @@
                                             foobar =
                                                 {
                                                     type = "app" ;
-                                                    program = "${ foobar.shell-scripts.foobar }" ;
+                                                    program = "${ foobar.tests }/observe.wrapped.sh" ;
                                                 } ;
                                         } ;
                                     checks =
@@ -450,8 +450,7 @@
                                                                         ${ pkgs.coreutils }/bin/echo There was error in ${ foobar.tests }. >&2 &&
                                                                             exit 60
                                                                     fi &&
-                                                                    ${ pkgs.coreutils }/bin/echo ${ foobar.shell-scripts.temporary } &&
-                                                                    exit 99
+                                                                    ${ pkgs.coreutils }/bin/echo ${ foobar.shell-scripts.temporary }
                                                             '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;
