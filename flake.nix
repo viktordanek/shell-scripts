@@ -308,11 +308,11 @@
                                                                                             mapper =
                                                                                                 value :
                                                                                                     [
-                                                                                                        "${ _environment-variable "ECHO" }"
-                                                                                                        "${ _environment-variable "ECHO" } We are observing ${ value.value.tests }"
-                                                                                                        "${ _environment-variable "ECHO" } ${ builtins.concatStringsSep " / " value.path }"
-                                                                                                        "${ value.tests }/observe.wrapped.sh"
-                                                                                                        "${ _environment-variable "ECHO" } SUCCESS"
+                                                                                                        ''${ _environment-variable "ECHO" } "- path: ${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.concatStringsSep " / " value.path ) }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  status: DELAYED"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  script: ${ value.value.shell-script }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  tests: ${ value.value.tests }"''
+                                                                                                        ''${ value.value.tests }/observe.wrapped.sh | ${ _environment-variable "YQ" } --yaml-output "{observe:.}" | ${ _environment-variable "SED" } "s#^#  #"''
                                                                                                     ] ;
                                                                                             in builtins.map mapper metrics.delayed ;
                                                                                     error =
@@ -320,10 +320,11 @@
                                                                                             mapper =
                                                                                                 value :
                                                                                                     [
-                                                                                                        "${ _environment-variable "ECHO" }"
-                                                                                                        "${ _environment-variable "ECHO" } We are stopping observation because there was an error in ${ value.value.tests }. >&2"
-                                                                                                        "${ _environment-variable "ECHO" } ${ builtins.concatStringsSep " / " value.path }"
-                                                                                                        "${ _environment-variable "ECHO" } ERROR"
+                                                                                                        ''${ _environment-variable "ECHO" } "- path: ${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.concatStringsSep " / " value.path ) }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  status: ERROR"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  script: ${ value.value.shell-script }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  tests: ${ value.value.tests }"''
+                                                                                                        ''${ value.value.tests }/observe.wrapped.sh | ${ _environment-variable "YQ" } --yaml-output "{observe:.}" | ${ _environment-variable "SED" } "s#^#  #"''
                                                                                                         "exit 64"
                                                                                                     ] ;
                                                                                             in builtins.map mapper metrics.error ;
@@ -332,10 +333,11 @@
                                                                                             mapper =
                                                                                                 value :
                                                                                                     [
-                                                                                                        "${ _environment-variable "ECHO" }"
-                                                                                                        "${ _environment-variable "ECHO" } We are stopping observation because there was a failure in ${ value.value.tests }. >&2"
-                                                                                                        "${ _environment-variable "ECHO" } ${ builtins.concatStringsSep " / " value.path }"
-                                                                                                        "${ _environment-variable "ECHO" } FAILURE"
+                                                                                                        ''${ _environment-variable "ECHO" } "- path: ${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.concatStringsSep " / " value.path ) }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  status: FAILURE"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  script: ${ value.value.shell-script }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  tests: ${ value.value.tests }"''
+                                                                                                        ''${ value.value.tests }/observe.wrapped.sh | ${ _environment-variable "YQ" } --yaml-output "{observe:.}" | ${ _environment-variable "SED" } "s#^#  #"''
                                                                                                         "exit 64"
                                                                                                     ] ;
                                                                                             in builtins.map mapper metrics.failure ;
@@ -348,9 +350,10 @@
                                                                                                         ''${ _environment-variable "ECHO" } "  status: SUCCESS"''
                                                                                                         ''${ _environment-variable "ECHO" } "  script: ${ value.value.shell-script }"''
                                                                                                         ''${ _environment-variable "ECHO" } "  tests: ${ value.value.tests }"''
+                                                                                                        ''${ value.value.tests }/observe.wrapped.sh | ${ _environment-variable "YQ" } --yaml-output "{observe:.}" | ${ _environment-variable "SED" } "s#^#  #"''
                                                                                                     ] ;
                                                                                             in builtins.map mapper metrics.success ;
-                                                                                    in "makeWrapper ${ pkgs.writeShellScript "observe.sh" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists ( builtins.concatLists [ success ] ) ) ) } ${ _environment-variable "OUT" }/observe.wrapped.sh --set ECHO ${ _environment-variable "ECHO" }"
+                                                                                    in "makeWrapper ${ pkgs.writeShellScript "observe.sh" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists ( builtins.concatLists [ error failure success delayed ] ) ) ) } ${ _environment-variable "OUT" }/observe.wrapped.sh --set ECHO ${ _environment-variable "ECHO" } --set SED ${ _environment-variable "SED" } --set YQ ${ _environment-variable "YQ" }"
                                                                             )
                                                                         ] ;
                                                                 metrics =
@@ -405,7 +408,7 @@
                                                                 in
                                                                     ''
                                                                         ${ pkgs.coreutils }/bin/mkdir $out &&
-                                                                            makeWrapper ${ pkgs.writeShellScript "constructor.sh" constructor } $out/constructor.wrapped.sh --set ECHO ${ pkgs.coreutils }/bin/echo --set LN ${ pkgs.coreutils }/bin/ln --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set OUT $out --set TOUCH ${ pkgs.coreutils }/bin/touch &&
+                                                                            makeWrapper ${ pkgs.writeShellScript "constructor.sh" constructor } $out/constructor.wrapped.sh --set ECHO ${ pkgs.coreutils }/bin/echo --set LN ${ pkgs.coreutils }/bin/ln --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set OUT $out --set TOUCH ${ pkgs.coreutils }/bin/touch --set SED ${ pkgs.gnused }/bin/sed --set YQ ${ pkgs.yq }/bin/yq &&
                                                                             $out/constructor.wrapped.sh &&
                                                                             ${ pkgs.coreutils }/bin/echo '${ builtins.toJSON metrics }' | ${ pkgs.yq }/bin/yq --yaml-output > $out/metrics.yaml
                                                                     '' ;
