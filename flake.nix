@@ -215,6 +215,34 @@
                                                                                     } ;
                                                                                 in
                                                                                 {
+                                                                                    cache =
+                                                                                        {
+                                                                                            init ? null ,
+                                                                                            post ? null ,
+                                                                                            release ? null
+                                                                                        } :
+                                                                                            let
+                                                                                                eval =
+                                                                                                    builtins.tryEval
+                                                                                                        (
+                                                                                                            let
+                                                                                                                _cache = builtins.getAttr system cache.lib ;
+                                                                                                                arguments =
+                                                                                                                    let
+                                                                                                                        augment =
+                                                                                                                            {
+                                                                                                                                extensions = extensions ;
+                                                                                                                                name = if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ;
+                                                                                                                            } ;
+                                                                                                                        in
+                                                                                                                            {
+                                                                                                                                init = if builtins.typeOf init == "set" then init // augment else init ;
+                                                                                                                                post = if builtins.typeOf post == "set" then post // augment else post ;
+                                                                                                                                release = if builtins.typeOf release == "set" then release // augment else release ;
+                                                                                                                            } ;
+                                                                                                                in _cache arguments
+                                                                                                        ) ;
+                                                                                                in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
                                                                                     shell-script =
                                                                                         {
                                                                                             mounts ? { } ,
