@@ -1,6 +1,7 @@
 {
     inputs =
         {
+            cache.url = "github:viktordanek/cache/scratch/3f2908d2-6680-475d-8bfe-09c564663310" ;
             environment-variable.url = "github:viktordanek/environment-variable" ;
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
@@ -9,7 +10,7 @@
             visitor.url = "github:viktordanek/visitor/scratch/1bd1c881-b72b-43d7-a819-f6072a9dfdf7" ;
         } ;
     outputs =
-        { environment-variable , flake-utils , nixpkgs , self , shell-script , temporary , visitor } :
+        { cache , environment-variable , flake-utils , nixpkgs , self , shell-script , temporary , visitor } :
             let
                 fun =
                     system :
