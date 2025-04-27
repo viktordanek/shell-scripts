@@ -346,8 +346,8 @@
                                                                                                     [
                                                                                                         ''${ _environment-variable "ECHO" } "- path: ${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.concatStringsSep " / " value.path ) }"''
                                                                                                         ''${ _environment-variable "ECHO" } "  status: SUCCESS"''
-                                                                                                        # ''${ _environment-variable "ECHO" } "  script: ${ value.value.shell-script }"''
-                                                                                                        # ''${ _environment-variable "ECHO" } "  tests: ${ value.value.tests }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  script: ${ value.value.shell-script }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  tests: ${ value.value.tests }"''
                                                                                                     ] ;
                                                                                             in builtins.map mapper metrics.success ;
                                                                                     in "makeWrapper ${ pkgs.writeShellScript "observe.sh" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists ( builtins.concatLists [ success ] ) ) ) } ${ _environment-variable "OUT" }/observe.wrapped.sh --set ECHO ${ _environment-variable "ECHO" }"
