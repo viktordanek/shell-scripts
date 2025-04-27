@@ -5,7 +5,7 @@
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
             shell-script.url = "github:viktordanek/shell-script/scratch/b6bb8f5b-7d48-4542-810c-58b5e36a3b0a" ;
-            temporary.url = "github:viktordanek/temporary/scratch/a18c0641-110a-4e3b-9261-260b8737c8b8" ;
+            temporary.url = "github:viktordanek/temporary/scratch/91d0cc40-baf7-4bdf-b307-5273d111db52" ;
             visitor.url = "github:viktordanek/visitor/scratch/1bd1c881-b72b-43d7-a819-f6072a9dfdf7" ;
         } ;
     outputs =
