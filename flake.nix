@@ -99,17 +99,10 @@
                                                                                     '' ;
                                                                             } ;
                                                                         # post =
-                                                                        #      {
-                                                                        #          profile =
-                                                                        #             { string , ... } :
-                                                                        #                 [
-                                                                        #                     ( string "CP" "${ pkgs.coreutils }/bin/cp" )
-                                                                        #                 ] ;
-                                                                        #         script =
-                                                                        #             ''
-                                                                        #                 ${ _environment-variable "CP" } --recursive /resource /archive
-                                                                        #             '' ;
-                                                                        #    } ;
+                                                                        #     {
+                                                                        #         script = "true" ;
+                                                                        #         tests = null ;
+                                                                        #     } ;
                                                                    } ;
                                                    } ;
                                             } ;
@@ -300,7 +293,7 @@
                                                                                                                                 init = if builtins.typeOf init == "set" then init // augment else init ;
                                                                                                                                 post = if builtins.typeOf post == "set" then post // augment else post ;
                                                                                                                                 release = if builtins.typeOf release == "set" then release // augment else release ;
-                                                                                                                                # self-teardown = self-teardown ;
+                                                                                                                                self-teardown = self-teardown ;
                                                                                                                             } ;
                                                                                                                 in _temporary arguments
                                                                                                         ) ;
