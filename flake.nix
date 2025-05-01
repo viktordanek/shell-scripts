@@ -68,11 +68,10 @@
                                                                 script = self + "/scripts/singleop.sh" ;
                                                                 tests = { } ;
                                                             } ;
-                                                # temporary =
-                                                #     { temporary , ... } :
-                                                #        temporary
-                                                #
-                                                #            {
+                                                temporary =
+                                                    { temporary , ... } :
+                                                       temporary
+                                                           {
                                                 #                 init =
                                                 #                    {
                                                 #                        profile =
@@ -106,7 +105,7 @@
                                                 #                                 ${ _environment-variable "TOUCH" } /release/release
                                                 #                             '' ;
                                                 #                     } ;
-                                                #            } ;
+                                                           } ;
                                             } ;
                                     } ;
                             lib =
