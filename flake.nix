@@ -69,43 +69,46 @@
                                                                 tests = { } ;
                                                             } ;
                                                 temporary =
-                                                    { temporary , ... } :
-                                                       temporary
-                                                           {
-                                                                init =
+                                                    {
+                                                        identity-file =
+                                                            { temporary , ... } :
+                                                               temporary
                                                                    {
-                                                                       profile =
-                                                                           { string , ... } :
-                                                                               [
-                                                                                   ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
-                                                                               ] ;
-                                                                       script =
-                                                                           ''
-                                                                               ${ _environment-variable "MKDIR" } /mount/target
-                                                                           '' ;
+                                                                        init =
+                                                                           {
+                                                                               profile =
+                                                                                   { string , ... } :
+                                                                                       [
+                                                                                           ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
+                                                                                       ] ;
+                                                                               script =
+                                                                                   ''
+                                                                                       ${ _environment-variable "MKDIR" } /mount/target
+                                                                                   '' ;
+                                                                           } ;
+                                                        #                 release =
+                                                        #                     {
+                                                        #                         mounts =
+                                                        #                             {
+                                                        #                                 "/release" =
+                                                        #                                     {
+                                                        #                                         host-path = _environment-variable "RELEASE" ;
+                                                        #                                         is-read-only = false ;
+                                                        #                                     } ;
+                                                        #                             } ;
+                                                        #                         profile =
+                                                        #                             { string , ... } :
+                                                        #                                 [
+                                                        #                                     ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                        #                                     ( string "TOUCH" "${ pkgs.coreutils }/bin/mkdir" )
+                                                        #                                 ] ;
+                                                        #                         script =
+                                                        #                             ''
+                                                        #                                 ${ _environment-variable "TOUCH" } /release/release
+                                                        #                             '' ;
+                                                        #                     } ;
                                                                    } ;
-                                                #                 release =
-                                                #                     {
-                                                #                         mounts =
-                                                #                             {
-                                                #                                 "/release" =
-                                                #                                     {
-                                                #                                         host-path = _environment-variable "RELEASE" ;
-                                                #                                         is-read-only = false ;
-                                                #                                     } ;
-                                                #                             } ;
-                                                #                         profile =
-                                                #                             { string , ... } :
-                                                #                                 [
-                                                #                                     ( string "CP" "${ pkgs.coreutils }/bin/cp" )
-                                                #                                     ( string "TOUCH" "${ pkgs.coreutils }/bin/mkdir" )
-                                                #                                 ] ;
-                                                #                         script =
-                                                #                             ''
-                                                #                                 ${ _environment-variable "TOUCH" } /release/release
-                                                #                             '' ;
-                                                #                     } ;
-                                                           } ;
+                                                   } ;
                                             } ;
                                     } ;
                             lib =
@@ -484,7 +487,7 @@
                                                                         ${ pkgs.coreutils }/bin/echo There was error in ${ foobar.tests }. >&2 &&
                                                                             exit 60
                                                                     fi &&
-                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary }. &&
+                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary.identity-file }. &&
                                                                     exit 99
                                                             '' ;
                                                         name = "foobar" ;
