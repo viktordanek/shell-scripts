@@ -70,43 +70,46 @@
                                                             } ;
                                                 temporary =
                                                     {
-                                                        identity-file =
+                                                        pin =
                                                             { temporary , ... } :
-                                                               temporary
-                                                                   {
+                                                                temporary
+                                                                    {
                                                                         init =
-                                                                           {
-                                                                               profile =
-                                                                                   { string , ... } :
-                                                                                       [
-                                                                                           ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
-                                                                                       ] ;
-                                                                               script =
-                                                                                   ''
-                                                                                       ${ _environment-variable "MKDIR" } /mount/target
-                                                                                   '' ;
-                                                                           } ;
-                                                        #                 release =
-                                                        #                     {
-                                                        #                         mounts =
-                                                        #                             {
-                                                        #                                 "/release" =
-                                                        #                                     {
-                                                        #                                         host-path = _environment-variable "RELEASE" ;
-                                                        #                                         is-read-only = false ;
-                                                        #                                     } ;
-                                                        #                             } ;
-                                                        #                         profile =
-                                                        #                             { string , ... } :
-                                                        #                                 [
-                                                        #                                     ( string "CP" "${ pkgs.coreutils }/bin/cp" )
-                                                        #                                     ( string "TOUCH" "${ pkgs.coreutils }/bin/mkdir" )
-                                                        #                                 ] ;
-                                                        #                         script =
-                                                        #                             ''
-                                                        #                                 ${ _environment-variable "TOUCH" } /release/release
-                                                        #                             '' ;
-                                                        #                     } ;
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "ECHO" } $(( ( ${ _environment-variable "RANDOM" } * ${ _environment-variable "RANDOM" } ) % 1000000 )) > /mount/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                        release =
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "CAT" "${ pkgs.coreutils }/bin/cat" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "CAT" } /resource/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                        # post =
+                                                                        #      {
+                                                                        #          profile =
+                                                                        #             { string , ... } :
+                                                                        #                 [
+                                                                        #                     ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                                        #                 ] ;
+                                                                        #         script =
+                                                                        #             ''
+                                                                        #                 ${ _environment-variable "CP" } --recursive /resource /archive
+                                                                        #             '' ;
+                                                                        #    } ;
                                                                    } ;
                                                    } ;
                                             } ;
@@ -487,7 +490,7 @@
                                                                         ${ pkgs.coreutils }/bin/echo There was error in ${ foobar.tests }. >&2 &&
                                                                             exit 60
                                                                     fi &&
-                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary.identity-file }. &&
+                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary.pin }. &&
                                                                     exit 99
                                                             '' ;
                                                         name = "foobar" ;
