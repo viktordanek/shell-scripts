@@ -483,7 +483,9 @@
                                                                     else
                                                                         ${ pkgs.coreutils }/bin/echo There was error in ${ foobar.tests }. >&2 &&
                                                                             exit 60
-                                                                    fi
+                                                                    fi &&
+                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary }. &&
+                                                                    exit 99
                                                             '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;
