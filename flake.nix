@@ -6,7 +6,7 @@
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
             shell-script.url = "github:viktordanek/shell-script/issue/50-new-implementation" ;
-            temporary.url = "github:viktordanek/temporary/issue/62-new-implementatiopn" ;
+            temporary.url = "github:viktordanek/temporary/issue/64-new-implementation" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
@@ -70,20 +70,21 @@
                                                             } ;
                                                 # temporary =
                                                 #     { temporary , ... } :
-                                                #         temporary
-                                                #             {
+                                                #        temporary
+                                                #
+                                                #            {
                                                 #                 init =
-                                                #                     {
-                                                #                         profile =
-                                                #                             { string , ... } :
-                                                #                                 [
-                                                #                                     ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
-                                                #                                 ] ;
-                                                #                         script =
-                                                #                             ''
-                                                #                                 ${ _environment-variable "MKDIR" } /mount/target
-                                                #                             '' ;
-                                                #                     } ;
+                                                #                    {
+                                                #                        profile =
+                                                #                            { string , ... } :
+                                                #                                [
+                                                #                                    ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
+                                                #                                ] ;
+                                                #                        script =
+                                                #                            ''
+                                                #                                ${ _environment-variable "MKDIR" } /mount/target
+                                                #                            '' ;
+                                                #                    } ;
                                                 #                 release =
                                                 #                     {
                                                 #                         mounts =
@@ -273,7 +274,8 @@
                                                                                         {
                                                                                             init ? null ,
                                                                                             post ? null ,
-                                                                                            release ? null
+                                                                                            release ? null ,
+                                                                                            self-teardown ? true
                                                                                         } :
                                                                                             let
                                                                                                 eval =
@@ -293,6 +295,7 @@
                                                                                                                                 init = if builtins.typeOf init == "set" then init // augment else init ;
                                                                                                                                 post = if builtins.typeOf post == "set" then post // augment else post ;
                                                                                                                                 release = if builtins.typeOf release == "set" then release // augment else release ;
+                                                                                                                                # self-teardown = self-teardown ;
                                                                                                                             } ;
                                                                                                                 in _temporary arguments
                                                                                                         ) ;
