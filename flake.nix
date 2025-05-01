@@ -72,18 +72,18 @@
                                                     { temporary , ... } :
                                                        temporary
                                                            {
-                                                #                 init =
-                                                #                    {
-                                                #                        profile =
-                                                #                            { string , ... } :
-                                                #                                [
-                                                #                                    ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
-                                                #                                ] ;
-                                                #                        script =
-                                                #                            ''
-                                                #                                ${ _environment-variable "MKDIR" } /mount/target
-                                                #                            '' ;
-                                                #                    } ;
+                                                                init =
+                                                                   {
+                                                                       profile =
+                                                                           { string , ... } :
+                                                                               [
+                                                                                   ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
+                                                                               ] ;
+                                                                       script =
+                                                                           ''
+                                                                               ${ _environment-variable "MKDIR" } /mount/target
+                                                                           '' ;
+                                                                   } ;
                                                 #                 release =
                                                 #                     {
                                                 #                         mounts =
