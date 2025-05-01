@@ -1,13 +1,13 @@
 {
     inputs =
         {
-            cache.url = "github:viktordanek/cache/scratch/3f2908d2-6680-475d-8bfe-09c564663310" ;
+            cache.url = "github:viktordanek/cache/issue/6-new-implementation" ;
             environment-variable.url = "github:viktordanek/environment-variable" ;
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
-            shell-script.url = "github:viktordanek/shell-script/scratch/b6bb8f5b-7d48-4542-810c-58b5e36a3b0a" ;
-            temporary.url = "github:viktordanek/temporary/scratch/91d0cc40-baf7-4bdf-b307-5273d111db52" ;
-            visitor.url = "github:viktordanek/visitor/scratch/1bd1c881-b72b-43d7-a819-f6072a9dfdf7" ;
+            shell-script.url = "github:viktordanek/shell-script/issue/50-new-implementation" ;
+            temporary.url = "github:viktordanek/temporary/issue/62-new-implementatiopn" ;
+            visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
         { cache , environment-variable , flake-utils , nixpkgs , self , shell-script , temporary , visitor } :
@@ -68,44 +68,44 @@
                                                                 script = self + "/scripts/singleop.sh" ;
                                                                 tests = { } ;
                                                             } ;
-                                                temporary =
-                                                    { temporary , ... } :
-                                                        temporary
-                                                            {
-                                                                init =
-                                                                    {
-                                                                        profile =
-                                                                            { string , ... } :
-                                                                                [
-                                                                                    ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
-                                                                                ] ;
-                                                                        script =
-                                                                            ''
-                                                                                ${ _environment-variable "MKDIR" } /mount/target
-                                                                            '' ;
-                                                                    } ;
-                                                                release =
-                                                                    {
-                                                                        mounts =
-                                                                            {
-                                                                                "/release" =
-                                                                                    {
-                                                                                        host-path = _environment-variable "RELEASE" ;
-                                                                                        is-read-only = false ;
-                                                                                    } ;
-                                                                            } ;
-                                                                        profile =
-                                                                            { string , ... } :
-                                                                                [
-                                                                                    ( string "CP" "${ pkgs.coreutils }/bin/cp" )
-                                                                                    ( string "TOUCH" "${ pkgs.coreutils }/bin/mkdir" )
-                                                                                ] ;
-                                                                        script =
-                                                                            ''
-                                                                                ${ _environment-variable "TOUCH" } /release/release
-                                                                            '' ;
-                                                                    } ;
-                                                            } ;
+                                                # temporary =
+                                                #     { temporary , ... } :
+                                                #         temporary
+                                                #             {
+                                                #                 init =
+                                                #                     {
+                                                #                         profile =
+                                                #                             { string , ... } :
+                                                #                                 [
+                                                #                                     ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
+                                                #                                 ] ;
+                                                #                         script =
+                                                #                             ''
+                                                #                                 ${ _environment-variable "MKDIR" } /mount/target
+                                                #                             '' ;
+                                                #                     } ;
+                                                #                 release =
+                                                #                     {
+                                                #                         mounts =
+                                                #                             {
+                                                #                                 "/release" =
+                                                #                                     {
+                                                #                                         host-path = _environment-variable "RELEASE" ;
+                                                #                                         is-read-only = false ;
+                                                #                                     } ;
+                                                #                             } ;
+                                                #                         profile =
+                                                #                             { string , ... } :
+                                                #                                 [
+                                                #                                     ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                #                                     ( string "TOUCH" "${ pkgs.coreutils }/bin/mkdir" )
+                                                #                                 ] ;
+                                                #                         script =
+                                                #                             ''
+                                                #                                 ${ _environment-variable "TOUCH" } /release/release
+                                                #                             '' ;
+                                                #                     } ;
+                                                #            } ;
                                             } ;
                                     } ;
                             lib =
@@ -130,7 +130,7 @@
                                                                                     (
                                                                                         let
                                                                                             point = value ( _environment-variable "OUT" ) ;
-                                                                                            in "makeWrapper ${ point.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh --set OUT ${ _environment-variable "OUT" }"
+                                                                                            in "makeWrapper ${ builtins.trace "HI ${ builtins.concatStringsSep ";" ( builtins.attrNames point ) }" point.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh --set OUT ${ _environment-variable "OUT" }"
                                                                                     )
                                                                                 ] ;
                                                                         list = path : list : builtins.concatLists list ;
@@ -481,8 +481,7 @@
                                                                     else
                                                                         ${ pkgs.coreutils }/bin/echo There was error in ${ foobar.tests }. >&2 &&
                                                                             exit 60
-                                                                    fi &&
-                                                                    ${ pkgs.coreutils }/bin/echo ${ foobar.shell-scripts.temporary }
+                                                                    fi
                                                             '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;
