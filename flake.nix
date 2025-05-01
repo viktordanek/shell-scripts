@@ -68,6 +68,30 @@
                                                                 script = self + "/scripts/singleop.sh" ;
                                                                 tests = { } ;
                                                             } ;
+                                                wtf =
+                                                    { shell-script , ... } :
+                                                        shell-script
+                                                            {
+                                                                mounts =
+                                                                    {
+                                                                        "/archive" =
+                                                                            {
+                                                                                host-path = _environment-variable "ARCHIVE" ;
+                                                                                is-read-only = false ;
+                                                                            } ;
+                                                                        "/resource" =
+                                                                            {
+                                                                                host-path = _environment-variable "RESOURCE" ;
+                                                                                is-read-only = true ;
+                                                                            } ;
+                                                                    } ;
+                                                                profile =
+                                                                    { string , ... } :
+                                                                        [
+                                                                            ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                                        ] ;
+                                                                script = ''${ _environment-variable "CP" } --recursive /resource /archive'' ;
+                                                            } ;
                                                 temporary =
                                                     {
                                                         pin =
@@ -98,11 +122,6 @@
                                                                                         ${ _environment-variable "CAT" } /resource/target
                                                                                     '' ;
                                                                             } ;
-                                                                        # post =
-                                                                        #     {
-                                                                        #         script = "true" ;
-                                                                        #         tests = null ;
-                                                                        #     } ;
                                                                    } ;
                                                    } ;
                                             } ;
@@ -483,7 +502,8 @@
                                                                         ${ pkgs.coreutils }/bin/echo There was error in ${ foobar.tests }. >&2 &&
                                                                             exit 60
                                                                     fi &&
-                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary.pin }. &&
+                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary.pin } &&
+                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.wtf } &&
                                                                     exit 99
                                                             '' ;
                                                         name = "foobar" ;
