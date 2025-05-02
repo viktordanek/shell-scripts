@@ -6,7 +6,7 @@
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
             shell-script.url = "github:viktordanek/shell-script/issue/50-new-implementation" ;
-            temporary.url = "github:viktordanek/temporary/scratch/c2c2add9-7400-4171-a54a-13b4380083f7" ;
+            temporary.url = "github:viktordanek/temporary/scratch/e48389f8-d9fb-49c7-95ad-45cffe5b8d1b" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
@@ -94,6 +94,25 @@
                                                             } ;
                                                 temporary =
                                                     {
+                                                        identity =
+                                                            { temporary , ... } :
+                                                                temporary
+                                                                    {
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
+                                                                                            ( string "SSH_KEYGEN" "${ pkgs.openssh }/bin/ssh-keygen" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "MKDIR" } /mount/target &&
+                                                                                            ${ _environment-variable "SSH_KEYGEN" } -f /mount/target/id-rsa -P ""
+                                                                                    '' ;
+                                                                            } ;
+                                                                    } ;
                                                         pin =
                                                             { temporary , ... } :
                                                                 temporary
@@ -136,6 +155,7 @@
                                                                                 tests = [ ] ;
                                                                             } ;
                                                                         self-teardown = true ;
+                                                                        teardown-delay = true ;
                                                                    } ;
                                                    } ;
                                             } ;
@@ -306,7 +326,8 @@
                                                                                             init ? null ,
                                                                                             post ? null ,
                                                                                             release ? null ,
-                                                                                            self-teardown ? true
+                                                                                            self-teardown ? true ,
+                                                                                            teardown-delay ? true
                                                                                         } :
                                                                                             let
                                                                                                 eval =
@@ -327,6 +348,7 @@
                                                                                                                                 post = if builtins.typeOf post == "set" then post // augment else post ;
                                                                                                                                 release = if builtins.typeOf release == "set" then release // augment else release ;
                                                                                                                                 self-teardown = self-teardown ;
+                                                                                                                                teardown-delay = teardown-delay ;
                                                                                                                             } ;
                                                                                                                 in _temporary arguments
                                                                                                         ) ;
@@ -515,8 +537,8 @@
                                                                         ${ pkgs.coreutils }/bin/echo There was error in ${ foobar.tests }. >&2 &&
                                                                             exit 60
                                                                     fi &&
+                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary.identity } &&
                                                                     ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary.pin } &&
-                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.wtf } &&
                                                                     exit 99
                                                             '' ;
                                                         name = "foobar" ;
