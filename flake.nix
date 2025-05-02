@@ -293,9 +293,12 @@
                                                                                 {
                                                                                     cache =
                                                                                         {
+                                                                                            force ? false ,
+                                                                                            lifespan ? 60 * 60 * 24 * 7 ,
                                                                                             init ? null ,
                                                                                             post ? null ,
-                                                                                            release ? null
+                                                                                            release ? null ,
+                                                                                            self-teardown ? true
                                                                                         } :
                                                                                             let
                                                                                                 eval =
@@ -312,13 +315,15 @@
                                                                                                                             } ;
                                                                                                                         in
                                                                                                                             {
+                                                                                                                                force = force ;
                                                                                                                                 init = if builtins.typeOf init == "set" then init // augment else init ;
                                                                                                                                 post = if builtins.typeOf post == "set" then post // augment else post ;
                                                                                                                                 release = if builtins.typeOf release == "set" then release // augment else release ;
+                                                                                                                                self-teardown = self-teardown ;
                                                                                                                             } ;
                                                                                                                 in _cache arguments
                                                                                                         ) ;
-                                                                                                in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
+                                                                                                in if eval.success then eval.value else builtins.throw "We had a problem evaluating cache ${ builtins.concatStringsSep " / " path }." ;
                                                                                     shell-script =
                                                                                         {
                                                                                             mounts ? { } ,
@@ -376,7 +381,7 @@
                                                                                                                             } ;
                                                                                                                 in _temporary arguments
                                                                                                         ) ;
-                                                                                                in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
+                                                                                                in if eval.success then eval.value else builtins.throw "We had a problem evaluating temporary ${ builtins.concatStringsSep " / " path }." ;
                                                                                 }
                                                                         ) ;
                                                         }
