@@ -1,7 +1,7 @@
 {
     inputs =
         {
-            cache.url = "github:viktordanek/cache/issue/6-new-implementation" ;
+            cache.url = "github:viktordanek/cache/scratch/c2a9ccb1-8bc6-4541-ad80-3a3d048b2a02" ;
             environment-variable.url = "github:viktordanek/environment-variable" ;
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
