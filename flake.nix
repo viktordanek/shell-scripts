@@ -101,15 +101,16 @@
                                                                         init =
                                                                             {
                                                                                 profile =
-                                                                                    { string , ... } :
+                                                                                    { shell-script , string , ... } :
                                                                                         [
                                                                                             ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
+                                                                                            ( shell-script "PIN" ( shell-scripts : shell-scripts.temporary.pin ) )
                                                                                             ( string "SSH_KEYGEN" "${ pkgs.openssh }/bin/ssh-keygen" )
                                                                                         ] ;
                                                                                 script =
                                                                                     ''
                                                                                         ${ _environment-variable "MKDIR" } /mount/target &&
-                                                                                            ${ _environment-variable "SSH_KEYGEN" } -f /mount/target/id-rsa -P ""
+                                                                                            ${ _environment-variable "SSH_KEYGEN" } -f /mount/target/id-rsa -P "$( ${ _environment-variable "PIN" } )"
                                                                                     '' ;
                                                                             } ;
                                                                     } ;
