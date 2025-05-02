@@ -409,6 +409,7 @@
                                                                                                                                 init = if builtins.typeOf init == "set" then init // augment else init ;
                                                                                                                                 post = if builtins.typeOf post == "set" then post // augment else post ;
                                                                                                                                 release = if builtins.typeOf release == "set" then release // augment else release ;
+                                                                                                                                seed = builtins.hashString "sha512" ( builtins.concatStringsSep " / " ( builtins.toJSON path ) ) ;
                                                                                                                                 self-teardown = self-teardown ;
                                                                                                                             } ;
                                                                                                                 in _cache arguments
