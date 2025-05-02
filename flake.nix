@@ -24,23 +24,41 @@
                                             {
                                                 cache =
                                                     {
-                                                        pin =
-                                                            { cache , ... } :
-                                                                cache
+                                                        identity =
+                                                            { temporary , ... } :
+                                                                temporary
                                                                     {
                                                                         init =
                                                                             {
                                                                                 profile =
-                                                                                    # { string , ... } :
-                                                                                    { ... } :
+                                                                                    { shell-script , string , ... } :
                                                                                         [
-                                                                                            # ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                            ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
+                                                                                            ( shell-script "PIN" ( shell-scripts : shell-scripts.cache.pin ) )
+                                                                                            ( string "SSH_KEYGEN" "${ pkgs.openssh }/bin/ssh-keygen" )
                                                                                         ] ;
                                                                                 script =
-                                                                                    "true" ;
-                                                                                    # ''
-                                                                                    #     ${ _environment-variable "ECHO" } $(( ( ${ _environment-variable "RANDOM" } * ${ _environment-variable "RANDOM" } ) % 1000000 )) > /mount/target
-                                                                                    # '' ;
+                                                                                    ''
+                                                                                        ${ _environment-variable "MKDIR" } /mount/target &&
+                                                                                            ${ _environment-variable "SSH_KEYGEN" } -f /mount/target/id-rsa -P "$( ${ _environment-variable "PIN" } )"
+                                                                                    '' ;
+                                                                            } ;
+                                                                    } ;
+                                                        pin =
+                                                            { temporary , ... } :
+                                                                temporary
+                                                                    {
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "ECHO" } $(( ( ${ _environment-variable "RANDOM" } * ${ _environment-variable "RANDOM" } ) % 1000000 )) > /mount/target
+                                                                                    '' ;
                                                                             } ;
                                                                         release =
                                                                             {
@@ -54,8 +72,45 @@
                                                                                         ${ _environment-variable "CAT" } /resource/target
                                                                                     '' ;
                                                                             } ;
+                                                                        post =
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "CP" } --recursive /resource /archive
+                                                                                    '' ;
+                                                                                tests = [ ] ;
+                                                                            } ;
                                                                         self-teardown = true ;
+                                                                        teardown-delay = true ;
                                                                    } ;
+                                                        private =
+                                                            { temporary , ... } :
+                                                                temporary
+                                                                    {
+                                                                        # An important difference between this and the temporary version
+                                                                        # is that the temporary version does not work because the identity is immediately thrown away
+                                                                        # so that the link ends up pointing to a non existant file
+                                                                        # but this is cached so that it will work for some time
+                                                                        # (eventually the cache will run out and this too will fail).
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { shell-script , string , ... } :
+                                                                                        [
+                                                                                            ( shell-script "IDENTITY" ( shell-scripts : shell-scripts.cache.identity ) )
+                                                                                            ( string "LN" "${ pkgs.coreutils }/bin/ln" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "LN" } --symbolic $( ${ _environment-variable "IDENTITY" } )/id-rsa /mount/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                    } ;
                                                    } ;
                                                 foobar =
                                                     { shell-script , ... } :
