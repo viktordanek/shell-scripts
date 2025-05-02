@@ -1087,16 +1087,16 @@
         "visitor": "visitor_5"
       },
       "locked": {
-        "lastModified": 1746181894,
+        "lastModified": 1746186942,
         "narHash": "sha256-KeYH09WK7dhdqT8KDQhswFyJ0KC6FVl/TdRnAfjM+9U=",
         "owner": "viktordanek",
         "repo": "temporary",
-        "rev": "3719171e34f142328326d64a89f7d9c9d60d4646",
+        "rev": "1bf52d84b738fed01ca80ded0476e8007378030f",
         "type": "github"
       },
       "original": {
         "owner": "viktordanek",
-        "ref": "scratch/e48389f8-d9fb-49c7-95ad-45cffe5b8d1b",
+        "ref": "issue/64-new-implementation",
         "repo": "temporary",
         "type": "github"
       }
