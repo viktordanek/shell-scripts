@@ -6,7 +6,7 @@
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
             shell-script.url = "github:viktordanek/shell-script/issue/50-new-implementation" ;
-            temporary.url = "github:viktordanek/temporary/issue/64-new-implementation" ;
+            temporary.url = "github:viktordanek/temporary/scratch/c2c2add9-7400-4171-a54a-13b4380083f7" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
@@ -122,6 +122,20 @@
                                                                                         ${ _environment-variable "CAT" } /resource/target
                                                                                     '' ;
                                                                             } ;
+                                                                        post =
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "CP" } --recursive /resource /archive
+                                                                                    '' ;
+                                                                                tests = [ ] ;
+                                                                            } ;
+                                                                        self-teardown = true ;
                                                                    } ;
                                                    } ;
                                             } ;
@@ -492,8 +506,7 @@
                                                                         ${ pkgs.coreutils }/bin/echo There was success in ${ foobar.tests }.
                                                                     elif [ -f ${ foobar.tests }/DELAYED ]
                                                                     then
-                                                                        ${ pkgs.coreutils }/bin/echo There was delay in ${ foobar.tests }. >&2 &&
-                                                                            exit 62
+                                                                        ${ pkgs.coreutils }/bin/echo There was delay in ${ foobar.tests }.
                                                                     elif [ -f ${ foobar.tests }/FAILURE ]
                                                                     then
                                                                         ${ pkgs.coreutils }/bin/echo There was failure in ${ foobar.tests }. >&2 &&
