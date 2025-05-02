@@ -25,8 +25,8 @@
                                                 cache =
                                                     {
                                                         identity =
-                                                            { temporary , ... } :
-                                                                temporary
+                                                            { cache , ... } :
+                                                                cache
                                                                     {
                                                                         init =
                                                                             {
@@ -45,8 +45,8 @@
                                                                             } ;
                                                                     } ;
                                                         pin =
-                                                            { temporary , ... } :
-                                                                temporary
+                                                            { cache , ... } :
+                                                                cache
                                                                     {
                                                                         init =
                                                                             {
@@ -86,11 +86,10 @@
                                                                                 tests = [ ] ;
                                                                             } ;
                                                                         self-teardown = true ;
-                                                                        teardown-delay = true ;
                                                                    } ;
                                                         private =
-                                                            { temporary , ... } :
-                                                                temporary
+                                                            { cache , ... } :
+                                                                cache
                                                                     {
                                                                         # An important difference between this and the temporary version
                                                                         # is that the temporary version does not work because the identity is immediately thrown away
