@@ -158,6 +158,29 @@
                                                                         self-teardown = true ;
                                                                         teardown-delay = true ;
                                                                    } ;
+                                                        private =
+                                                            { temporary , ... } :
+                                                                temporary
+                                                                    {
+                                                                        # This "does not work".
+                                                                        # Since the identity is deleted as soon as it is not needed anymore
+                                                                        # not long after the link is created the identity is deleted
+                                                                        # and the link no longer points to a file.
+                                                                        # This is correct behavior.
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { shell-script , string , ... } :
+                                                                                        [
+                                                                                            ( shell-script "IDENTITY" ( shell-scripts : shell-scripts.temporary.identity ) )
+                                                                                            ( string "LN" "${ pkgs.coreutils }/bin/ln" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "LN" } --symbolic $( ${ _environment-variable "IDENTITY" } )/id-rsa /mount/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                    } ;
                                                    } ;
                                             } ;
                                     } ;
@@ -540,6 +563,7 @@
                                                                     fi &&
                                                                     ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary.identity } &&
                                                                     ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary.pin } &&
+                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY_SCRIPT ${ foobar.shell-scripts.temporary.private } &&
                                                                     exit 99
                                                             '' ;
                                                         name = "foobar" ;
