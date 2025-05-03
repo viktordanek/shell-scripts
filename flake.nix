@@ -34,12 +34,12 @@
                                                                                     { shell-script , string , ... } :
                                                                                         [
                                                                                             ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
-                                                                                            ( shell-script "IDENTITY" ( shell-scripts : shell-scripts.cache.private ) )
+                                                                                            ( shell-script "IDENTITY_FILE" ( shell-scripts : shell-scripts.cache.private ) )
                                                                                             ( string "YQ" "${ pkgs.yq }/bin/yq" )
                                                                                         ] ;
                                                                                 script =
                                                                                     ''
-                                                                                        ${ _environment-variable "ECHO" } '{ "Host" : "github.com" , "User" : "git" , "IdentityFile" : "${ _environment-variable "IDENTITY_FILE" }" }' | ${ _environment-variable "YQ" } --yaml-output > /mount/target
+                                                                                        ${ _environment-variable "ECHO" } { "Host" : "github.com" , "User" : "git" , "IdentityFile" : "$( ${ _environment-variable "IDENTITY_FILE" } )" } | ${ _environment-variable "YQ" } --yaml-output > /mount/target
                                                                                     '' ;
                                                                             } ;
                                                                     } ;
