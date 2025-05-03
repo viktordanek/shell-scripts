@@ -1,337 +1,689 @@
 {
     inputs =
         {
+            cache.url = "github:viktordanek/cache/issue/6-new-implementation" ;
+            environment-variable.url = "github:viktordanek/environment-variable" ;
             flake-utils.url = "github:numtide/flake-utils" ;
             nixpkgs.url = "github:NixOs/nixpkgs" ;
-            originator-pid.url = "github:viktordanek/originator-pid/6119b7f41d4b666d535a21862aaaa906fbe197a7" ;
-            shell-script.url = "github:viktordanek/shell-script" ;
-            string.url = "github:viktordanek/string" ;
-            standard-input.url = "github:viktordanek/standard-input" ;
-            temporary.url = "github:viktordanek/temporary" ;
+            shell-script.url = "github:viktordanek/shell-script/issue/50-new-implementation" ;
+            temporary.url = "github:viktordanek/temporary/issue/64-new-implementation" ;
             visitor.url = "github:viktordanek/visitor" ;
         } ;
     outputs =
-        { flake-utils , nixpkgs , originator-pid , self , shell-script , standard-input , temporary , string , visitor } :
+        { cache , environment-variable , flake-utils , nixpkgs , self , shell-script , temporary , visitor } :
             let
                 fun =
                     system :
                         let
-                            _shell-script = builtins.getAttr system shell-script.lib ;
+                            _environment-variable = builtins.getAttr system environment-variable.lib ;
                             _visitor = builtins.getAttr system visitor.lib ;
+                            foobar =
+                                lib
+                                    {
+                                        shell-scripts =
+                                            {
+                                                cache =
+                                                    {
+                                                        config =
+                                                            { cache , ... } :
+                                                                cache
+                                                                    {
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { shell-script , string , ... } :
+                                                                                        [
+                                                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                            ( shell-script "IDENTITY_FILE" ( shell-scripts : shell-scripts.cache.private ) )
+                                                                                            ( string "YQ" "${ pkgs.yq }/bin/yq" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "ECHO" } { "Host" : "github.com" , "User" : "git" , "IdentityFile" : "$( ${ _environment-variable "IDENTITY_FILE" } )" } | ${ _environment-variable "YQ" } --yaml-output > /mount/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                    } ;
+                                                        identity =
+                                                            { cache , ... } :
+                                                                cache
+                                                                    {
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { shell-script , string , ... } :
+                                                                                        [
+                                                                                            ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
+                                                                                            ( shell-script "PIN" ( shell-scripts : shell-scripts.cache.pin ) )
+                                                                                            ( string "SSH_KEYGEN" "${ pkgs.openssh }/bin/ssh-keygen" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "MKDIR" } /mount/target &&
+                                                                                            ${ _environment-variable "SSH_KEYGEN" } -f /mount/target/id-rsa -P "$( ${ _environment-variable "PIN" } )"
+                                                                                    '' ;
+                                                                            } ;
+                                                                    } ;
+                                                        pin =
+                                                            { cache , ... } :
+                                                                cache
+                                                                    {
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "ECHO" } $(( ( ${ _environment-variable "RANDOM" } * ${ _environment-variable "RANDOM" } ) % 1000000 )) > /mount/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                        release =
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "CAT" "${ pkgs.coreutils }/bin/cat" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "CAT" } /resource/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                        post =
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "CP" } --recursive /resource /archive
+                                                                                    '' ;
+                                                                                tests = [ ] ;
+                                                                            } ;
+                                                                        self-teardown = true ;
+                                                                   } ;
+                                                        private =
+                                                            { cache , ... } :
+                                                                cache
+                                                                    {
+                                                                        # An important difference between this and the temporary version
+                                                                        # is that the temporary version does not work because the identity is immediately thrown away
+                                                                        # so that the link ends up pointing to a non existant file
+                                                                        # but this is cached so that it will work for some time
+                                                                        # (eventually the cache will run out and this too will fail).
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { shell-script , string , ... } :
+                                                                                        [
+                                                                                            ( shell-script "IDENTITY" ( shell-scripts : shell-scripts.cache.identity ) )
+                                                                                            ( string "LN" "${ pkgs.coreutils }/bin/ln" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "LN" } --symbolic $( ${ _environment-variable "IDENTITY" } )/id-rsa /mount/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                    } ;
+                                                   } ;
+                                                foobar =
+                                                    { shell-script , ... } :
+                                                        shell-script
+                                                            {
+                                                                profile =
+                                                                    { path , shell-script , string } :
+                                                                        [
+                                                                            ( string "JQ" "${ pkgs.jq }/bin/jq" )
+                                                                            ( path "PATH_VALUE" 0 )
+                                                                            ( shell-script "SINGLEOP" ( shell-scripts : shell-scripts.singleop ) )
+                                                                            ( string "STRING_VALUE" "a1895e773961f633c7c6178a7fda16f8d630cfcbc911080c7c8ec713dd882b8b5152abcc22c40b324c8b5df01070ba57348c02788cb07b31464fcba309036d1c" )
+                                                                            ( string "TEMPLATE_FILE" ( self + "/scripts/foobar.json" ) )
+                                                                            ( string "YQ" "${ pkgs.yq }/bin/yq" )
+                                                                        ] ;
+                                                                script = self + "/scripts/foobar.sh" ;
+                                                                tests =
+                                                                    ignore :
+                                                                        {
+                                                                            standard-output = self + "/expected/standard-output" ;
+                                                                        } ;
+                                                            } ;
+                                                noop =
+                                                    { shell-script , ... } :
+                                                        shell-script
+                                                            {
+                                                                profile =
+                                                                    { string , ... } :
+                                                                        [
+                                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                        ] ;
+                                                                script = self + "/scripts/noop.sh" ;
+                                                                tests = { } ;
+                                                            } ;
+                                                singleop =
+                                                    { shell-script , ... } :
+                                                        shell-script
+                                                            {
+                                                                profile =
+                                                                    { string , ... } :
+                                                                        [
+                                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                            ( string "STANDARD_OUTPUT" "c9d2c2560dc2693fc39549d8272aa6d134c6e7f3920b44b396ed2bd9b4e2d116061cfba9e4c9ddb80cc9b24864df5c103eb3c890fafe02dbe226ea9c9608e7f9" )
+                                                                        ] ;
+                                                                script = self + "/scripts/singleop.sh" ;
+                                                                tests = { } ;
+                                                            } ;
+                                                wtf =
+                                                    { shell-script , ... } :
+                                                        shell-script
+                                                            {
+                                                                mounts =
+                                                                    {
+                                                                        "/archive" =
+                                                                            {
+                                                                                host-path = _environment-variable "ARCHIVE" ;
+                                                                                is-read-only = false ;
+                                                                            } ;
+                                                                        "/resource" =
+                                                                            {
+                                                                                host-path = _environment-variable "RESOURCE" ;
+                                                                                is-read-only = true ;
+                                                                            } ;
+                                                                    } ;
+                                                                profile =
+                                                                    { string , ... } :
+                                                                        [
+                                                                            ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                                        ] ;
+                                                                script = ''${ _environment-variable "CP" } --recursive /resource /archive'' ;
+                                                            } ;
+                                                temporary =
+                                                    {
+                                                        identity =
+                                                            { temporary , ... } :
+                                                                temporary
+                                                                    {
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { shell-script , string , ... } :
+                                                                                        [
+                                                                                            ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
+                                                                                            ( shell-script "PIN" ( shell-scripts : shell-scripts.temporary.pin ) )
+                                                                                            ( string "SSH_KEYGEN" "${ pkgs.openssh }/bin/ssh-keygen" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "MKDIR" } /mount/target &&
+                                                                                            ${ _environment-variable "SSH_KEYGEN" } -f /mount/target/id-rsa -P "$( ${ _environment-variable "PIN" } )"
+                                                                                    '' ;
+                                                                            } ;
+                                                                    } ;
+                                                        pin =
+                                                            { temporary , ... } :
+                                                                temporary
+                                                                    {
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "ECHO" } $(( ( ${ _environment-variable "RANDOM" } * ${ _environment-variable "RANDOM" } ) % 1000000 )) > /mount/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                        release =
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "CAT" "${ pkgs.coreutils }/bin/cat" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "CAT" } /resource/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                        post =
+                                                                            {
+                                                                                profile =
+                                                                                    { string , ... } :
+                                                                                        [
+                                                                                            ( string "CP" "${ pkgs.coreutils }/bin/cp" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "CP" } --recursive /resource /archive
+                                                                                    '' ;
+                                                                                tests = [ ] ;
+                                                                            } ;
+                                                                        self-teardown = true ;
+                                                                        teardown-delay = true ;
+                                                                   } ;
+                                                        private =
+                                                            { temporary , ... } :
+                                                                temporary
+                                                                    {
+                                                                        # This "does not work".
+                                                                        # Since the identity is deleted as soon as it is not needed anymore
+                                                                        # not long after the link is created the identity is deleted
+                                                                        # and the link no longer points to a file.
+                                                                        # This is correct behavior.
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { shell-script , string , ... } :
+                                                                                        [
+                                                                                            ( shell-script "IDENTITY" ( shell-scripts : shell-scripts.temporary.identity ) )
+                                                                                            ( string "LN" "${ pkgs.coreutils }/bin/ln" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "LN" } --symbolic $( ${ _environment-variable "IDENTITY" } )/id-rsa /mount/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                    } ;
+                                                   } ;
+                                            } ;
+                                    } ;
                             lib =
                                 {
+                                    archive ? "ARCHIVE" ,
                                     default-name ? "script" ,
+                                    resources ? "RESOURCES" ,
                                     shell-scripts ? null ,
                                 } :
                                     let
-                                        _shell-scripts =
-                                            _visitor
-                                                {
-                                                    lambda = path : value : builtins.concatStringsSep "/" ( builtins.concatLists [ [ derivation ] ( builtins.map builtins.toJSON path ) ] ) ;
-                                                }
-                                                {
-                                                }
-                                                primary ;
                                         derivation =
                                             pkgs.stdenv.mkDerivation
                                                 {
                                                     installPhase =
                                                         let
-                                                            constructors =
+                                                            constructor =
                                                                 _visitor
                                                                     {
                                                                         lambda =
                                                                             path : value :
-                                                                                let
-                                                                                    primary = value ( injection path "$out" ) ;
-                                                                                    in
-                                                                                        [
-                                                                                            "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.shell-script } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                        ] ;
+                                                                                [
+                                                                                    (
+                                                                                        let
+                                                                                            point = value ( _environment-variable "OUT" ) ;
+                                                                                            in "makeWrapper ${ builtins.trace "HI ${ builtins.concatStringsSep ";" ( builtins.attrNames point ) }" point.shell-script } ${ _environment-variable "OUT" }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh --set OUT ${ _environment-variable "OUT" }"
+                                                                                    )
+                                                                                ] ;
+                                                                        list = path : list : builtins.concatLists list ;
+                                                                        set = path : set : builtins.concatLists ( builtins.attrValues set ) ;
                                                                     }
-                                                                    {
-                                                                        list =
-                                                                            path : list :
-                                                                                builtins.concatLists
-                                                                                    [
-                                                                                        [
-                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                        ]
-                                                                                        ( builtins.concatLists list )
-                                                                                    ] ;
-                                                                        set =
-                                                                            path : set :
-                                                                                builtins.concatLists
-                                                                                    [
-                                                                                        [
-                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                        ]
-                                                                                        ( builtins.concatLists ( builtins.attrValues set ) )
-                                                                                    ] ;
-                                                                    }
-                                                                    primary ;
-                                                            in builtins.concatStringsSep " &&\n\t" constructors ;
-                                                    name = "shell-scripts" ;
+                                                                    primary.shell-scripts ;
+                                                            in
+                                                                ''
+                                                                    ${ pkgs.coreutils }/bin/mkdir $out &&
+                                                                        ${ pkgs.coreutils }/bin/mkdir $out/bin
+                                                                        ${ pkgs.coreutils }/bin/ln --symbolic ${ pkgs.writeShellScript "constructors" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "source ${ _environment-variable "MAKE_WRAPPER" }/nix-support/setup-hook" ] constructor ] ) ) } $out/bin/constructor.sh &&
+                                                                        makeWrapper $out/bin/constructor.sh $out/bin/constructor.wrapped.sh --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set MKDIR ${ pkgs.coreutils }/bin/mkdir --set OUT $out &&
+                                                                        $out/bin/constructor.wrapped.sh
+                                                                '' ;
+                                                    name = "derivation" ;
+                                                    nativeBuildInputs = [ pkgs.makeWrapper ] ;
                                                     src = ./. ;
                                                 } ;
-                                            injection =
-                                                path : derivation :
-                                                    {
-                                                        shell-script =
-                                                            {
-                                                                environment ? x : [ ] ,
-                                                                script ,
-                                                                tests ? null
-                                                            } :
-                                                                let
-                                                                    eval =
-                                                                        builtins.tryEval
-                                                                            (
-                                                                                _shell-script
-                                                                                    {
-                                                                                        environment = environment ;
-                                                                                        extensions =
-                                                                                            {
-                                                                                                originator-pid = builtins.getAttr system originator-pid.lib ;
-                                                                                                path-int =
-                                                                                                    name : index :
-                                                                                                        if builtins.typeOf index == "int" then
-                                                                                                            if index < 0 then builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is less than zero."
-                                                                                                            else if index >= builtins.length path then builtins.throw "The index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is greater than or equal to the length of the path ${ builtins.toString ( builtins.length path ) }."
-                                                                                                            else
-                                                                                                                if builtins.typeOf ( builtins.elemAt path index ) == "int" then "--set ${ name } ${ builtins.toString ( builtins.elemAt path index ) }"
-                                                                                                                else if builtins.typeOf ( builtins.elemAt path index ) == "string" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is a string and not an int it would be better to use path-string."
-                                                                                                                else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
-                                                                                                        else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
-                                                                                                path-string =
-                                                                                                    name : index :
-                                                                                                        if builtins.typeOf index == "int" then
-                                                                                                            if index < 0 then builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is less than zero."
-                                                                                                            else if index >= builtins.length path then builtins.throw "The index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is greater than or equal to the length of the path ${ builtins.toString ( builtins.length path ) }."
-                                                                                                            else
-                                                                                                                if builtins.typeOf ( builtins.elemAt path index ) == "string" then "--set ${ name } ${ builtins.elemAt path index }"
-                                                                                                                else if builtins.typeOf ( builtins.elemAt path index ) == "int" then builtins.throw "since the index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is an int and not a string it would be better to use path-int."
-                                                                                                                else builtins.throw "the value at index = ${ builtins.toString index } element of path = ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int, string but builtins.typeOf ( builtins.elemAt path index )"
-                                                                                                        else builtins.throw "the index defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not int but ${ builtins.typeOf index }." ;
-                                                                                                shell-scripts =
-                                                                                                    name : fun :
-                                                                                                        let
-                                                                                                            in
-                                                                                                                "--set ${ name } ${ fun shell-scripts }" ;
-                                                                                                standard-input = builtins.getAttr system standard-input.lib ;
-                                                                                                string = builtins.getAttr system string.lib ;
-                                                                                            } ;
-                                                                                        name = builtins.toString ( if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else default-name ) ;
-                                                                                        script = script ;
-                                                                                        tests = tests ;
-                                                                                    }
-                                                                            ) ;
-                                                                        shell-scripts =
-                                                                            _visitor
-                                                                                {
-                                                                                    lambda = path : value : builtins.concatStringsSep "/" ( builtins.concatLists [ [ derivation ] ( builtins.map builtins.toJSON path ) ] ) ;
-                                                                                }
-                                                                                {
-                                                                                }
-                                                                                primary ;
-                                                                    in
-                                                                        if eval.success then eval.value
-                                                                        else builtins.throw "There was a problem evaluating the shell-script defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
-                                                        temporary =
-                                                            {
-                                                                init ? null ,
-                                                                release ? null ,
-                                                                post ? null ,
-                                                                tests ? null
-                                                            } :
-                                                                let
-                                                                    eval =
-                                                                        builtins.tryEval
-                                                                            (
-                                                                                builtins.getAttr system temporary.lib
-                                                                                    {
-                                                                                        init =
-                                                                                             if builtins.typeOf init == "lambda" then init shell-scripts
-                                                                                             else if builtins.typeOf init == "null" then init
-                                                                                             else builtins.throw "The init for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf init }." ;
-                                                                                       post =
-                                                                                            if builtins.typeOf post == "lambda" then post shell-scripts
-                                                                                            else if builtins.typeOf post == "null" then post
-                                                                                            else builtins.throw "The post for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf post }." ;
-                                                                                       release =
-                                                                                            if builtins.typeOf init == "lambda" then release shell-scripts
-                                                                                            else if builtins.typeOf release == "null" then release
-                                                                                            else builtins.throw "The release for the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) } is not lambda, null but ${ builtins.typeOf release }." ;
-                                                                                        tests = tests ;
-                                                                                    }
-                                                                        ) ;
-                                                                in
-                                                                    if eval.success then eval.value
-                                                                    else builtins.throw "There was a problem evaluating the temporary defined at ${ builtins.concatStringsSep " / " ( builtins.map builtins.toJSON path ) }." ;
-                                                    } ;
                                         primary =
-                                            _visitor
-                                                {
-                                                    lambda = path : value : value ;
-                                                }
-                                                { }
-                                                shell-scripts ;
-                                in
-                                    {
-                                        shell-scripts = _shell-scripts ;
-                                        tests =
-                                            pkgs.stdenv.mkDerivation
-                                                {
-                                                    installPhase =
-                                                        let
-                                                            constructors =
-                                                                _visitor
-                                                                    {
-                                                                        lambda =
-                                                                            path : value :
+                                            {
+                                                archive = archive ;
+                                                default-name =
+                                                    if builtins.typeOf default-name == "string" then default-name
+                                                    else builtins.throw "default-name is not string but ${ builtins.typeOf default-name }." ;
+                                                resources = resources ;
+                                                shell-scripts =
+                                                    _visitor
+                                                        {
+                                                            lambda =
+                                                                path : value : derivation :
+                                                                    value
+                                                                        (
+                                                                            let
+                                                                                extensions =
+                                                                                    {
+                                                                                        path =
+                                                                                            name : index :
+                                                                                                let
+                                                                                                    point =
+                                                                                                        {
+                                                                                                            index =
+                                                                                                                if builtins.typeOf index == "int" then index
+                                                                                                                else builtins.throw "index is not int but ${ builtins.typeOf index }." ;
+                                                                                                            name =
+                                                                                                                if builtins.typeOf name == "string" then name
+                                                                                                                else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
+                                                                                                        } ;
+                                                                                                    value = builtins.elemAt path point.index ;
+                                                                                                    in "export ${ point.name }=${ builtins.toString value }" ;
+                                                                                        shell-script =
+                                                                                            name : fun :
+                                                                                                let
+                                                                                                    point =
+                                                                                                        {
+                                                                                                            fun =
+                                                                                                                if builtins.typeOf fun == "lambda" then fun
+                                                                                                                else builtins.throw "fun is not lambda but ${ builtins.typeOf fun }." ;
+                                                                                                            name =
+                                                                                                                if builtins.typeOf name == "string" then name
+                                                                                                                else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
+                                                                                                        } ;
+                                                                                                    shell-scripts =
+                                                                                                        _visitor
+                                                                                                            {
+                                                                                                                lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
+                                                                                                            }
+                                                                                                            primary.shell-scripts ;
+                                                                                                    in "export ${ point.name }=${ point.fun shell-scripts }" ;
+                                                                                        string =
+                                                                                            name : value :
+                                                                                                let
+                                                                                                    point =
+                                                                                                        {
+                                                                                                            name =
+                                                                                                                if builtins.typeOf name == "string" then name
+                                                                                                                else builtins.throw "name is not string but ${ builtins.typeOf name }." ;
+                                                                                                            value =
+                                                                                                                if builtins.typeOf value == "string" then value
+                                                                                                                else builtins.throw "value is not string but ${ builtins.typeOf value }." ;
+                                                                                                        } ;
+                                                                                                    in "export ${ point.name }=${ point.value }" ;
+                                                                                    } ;
+                                                                                in
+                                                                                {
+                                                                                    cache =
+                                                                                        {
+                                                                                            force ? false ,
+                                                                                            lifespan ? 60 * 60 * 24 * 7 ,
+                                                                                            init ? null ,
+                                                                                            post ? null ,
+                                                                                            release ? null ,
+                                                                                            self-teardown ? true
+                                                                                        } :
+                                                                                            let
+                                                                                                eval =
+                                                                                                    builtins.tryEval
+                                                                                                        (
+                                                                                                            let
+                                                                                                                _cache = builtins.getAttr system cache.lib ;
+                                                                                                                arguments =
+                                                                                                                    let
+                                                                                                                        augment =
+                                                                                                                            {
+                                                                                                                                extensions = extensions ;
+                                                                                                                                name = if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ;
+                                                                                                                            } ;
+                                                                                                                        in
+                                                                                                                            {
+                                                                                                                                force = force ;
+                                                                                                                                init = if builtins.typeOf init == "set" then init // augment else init ;
+                                                                                                                                post = if builtins.typeOf post == "set" then post // augment else post ;
+                                                                                                                                release = if builtins.typeOf release == "set" then release // augment else release ;
+                                                                                                                                seed = builtins.hashString "sha512" ( builtins.toJSON path ) ;
+                                                                                                                                self-teardown = self-teardown ;
+                                                                                                                            } ;
+                                                                                                                in _cache arguments
+                                                                                                        ) ;
+                                                                                                in if eval.success then eval.value else builtins.throw "We had a problem evaluating cache ${ builtins.concatStringsSep " / " path }." ;
+                                                                                    shell-script =
+                                                                                        {
+                                                                                            mounts ? { } ,
+                                                                                            name ? if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ,
+                                                                                            profile ? { ... } : [ ] ,
+                                                                                            script ,
+                                                                                            tests ? null
+                                                                                        } :
+                                                                                            let
+                                                                                                eval  =
+                                                                                                    builtins.tryEval
+                                                                                                        (
+                                                                                                            let
+                                                                                                                _shell-script = builtins.getAttr system shell-script.lib ;
+                                                                                                                arguments =
+                                                                                                                    {
+                                                                                                                        extensions = extensions ;
+                                                                                                                        mounts = mounts ;
+                                                                                                                        name = name ;
+                                                                                                                        profile = profile ;
+                                                                                                                        script = script ;
+                                                                                                                        tests = tests ;
+                                                                                                                    } ;
+                                                                                                                in _shell-script arguments
+                                                                                                        ) ;
+                                                                                                in if eval.success then eval.value else builtins.throw "We had a problem evaluating ${ builtins.concatStringsSep " / " path }." ;
+                                                                                    temporary =
+                                                                                        {
+                                                                                            init ? null ,
+                                                                                            post ? null ,
+                                                                                            release ? null ,
+                                                                                            self-teardown ? true ,
+                                                                                            teardown-delay ? true
+                                                                                        } :
+                                                                                            let
+                                                                                                eval =
+                                                                                                    builtins.tryEval
+                                                                                                        (
+                                                                                                            let
+                                                                                                                _temporary = builtins.getAttr system temporary.lib ;
+                                                                                                                arguments =
+                                                                                                                    let
+                                                                                                                        augment =
+                                                                                                                            {
+                                                                                                                                extensions = extensions ;
+                                                                                                                                name = if builtins.length path > 0 then builtins.elemAt path ( ( builtins.length path ) - 1 ) else primary.default-name ;
+                                                                                                                            } ;
+                                                                                                                        in
+                                                                                                                            {
+                                                                                                                                init = if builtins.typeOf init == "set" then init // augment else init ;
+                                                                                                                                post = if builtins.typeOf post == "set" then post // augment else post ;
+                                                                                                                                release = if builtins.typeOf release == "set" then release // augment else release ;
+                                                                                                                                self-teardown = self-teardown ;
+                                                                                                                                teardown-delay = teardown-delay ;
+                                                                                                                            } ;
+                                                                                                                in _temporary arguments
+                                                                                                        ) ;
+                                                                                                in if eval.success then eval.value else builtins.throw "We had a problem evaluating temporary ${ builtins.concatStringsSep " / " path }." ;
+                                                                                }
+                                                                        ) ;
+                                                        }
+                                                        shell-scripts ;
+                                            } ;
+                                    in
+                                        {
+                                            derivation = derivation ;
+                                            shell-scripts =
+                                                _visitor
+                                                    {
+                                                        lambda = path : value : "${ derivation }/${ builtins.hashString "sha512" ( builtins.concatStringsSep "/" ( builtins.map builtins.toJSON path ) ) }.wrapped.sh" ;
+                                                    }
+                                                    primary.shell-scripts ;
+                                            tests =
+                                                pkgs.stdenv.mkDerivation
+                                                    {
+                                                        installPhase =
+                                                            let
+                                                                constructor =
+                                                                    builtins.concatStringsSep
+                                                                        " &&\n\t"
+                                                                        [
+                                                                            (
                                                                                 let
-                                                                                    primary = value ( injection path derivation ) ;
-                                                                                    in
-                                                                                        [
-                                                                                           # "if ! ${ pkgs.diffutils }/bin/diff --recursive ${ primary.tests }/expected ${ primary.tests }/observed ; then ${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) } ; fi"
-                                                                                           "${ pkgs.coreutils }/bin/ln --symbolic ${ primary.tests } ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                        ] ;
-                                                                    }
-                                                                    {
-                                                                        list =
-                                                                            path : list :
-                                                                                builtins.concatLists
-                                                                                    [
-                                                                                        [
-                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                        ]
-                                                                                        ( builtins.concatLists list )
-                                                                                    ] ;
-                                                                        set =
-                                                                            path : set :
-                                                                                builtins.concatLists
-                                                                                    [
-                                                                                        [
-                                                                                            "${ pkgs.coreutils }/bin/mkdir ${ builtins.concatStringsSep "/" ( builtins.concatLists [ [ "$out" ] ( builtins.map builtins.toJSON path ) ] ) }"
-                                                                                        ]
-                                                                                        ( builtins.concatLists ( builtins.attrValues set ) )
-                                                                                    ] ;
-                                                                    }
-                                                                    primary ;
-                                                            in builtins.concatStringsSep " &&\n\t" ( builtins.concatLists [ [ "${ pkgs.coreutils }/bin/echo $out" ] constructors ] ) ;
-                                                    name = "tests" ;
-                                                    src = ./. ;
-                                                } ;
-                                    } ;
-                            pkgs = builtins.import nixpkgs { system = system ; } ;
+                                                                                    status =
+                                                                                        if builtins.length metrics.all == builtins.length metrics.success && builtins.length metrics.delayed == 0 && builtins.length metrics.error == 0 && builtins.length metrics.failure == 0 then "SUCCESS"
+                                                                                        else if builtins.length metrics.all == ( builtins.length metrics.success ) + ( builtins.length metrics.delayed ) && builtins.length metrics.error == 0 && builtins.length metrics.failure == 0 then "DELAYED"
+                                                                                        else if builtins.length metrics.all == ( builtins.length metrics.success ) + ( builtins.length metrics.delayed ) + ( builtins.length metrics.failure ) && builtins.length metrics.error == 0 then "FAILURE"
+                                                                                        else "ERROR" ;
+                                                                                    in "${ _environment-variable "TOUCH" } ${ _environment-variable "OUT" }/${ status }"
+                                                                            )
+                                                                            "source ${ _environment-variable "MAKE_WRAPPER" }/nix-support/setup-hook"
+                                                                            (
+                                                                                let
+                                                                                    delayed =
+                                                                                        let
+                                                                                            mapper =
+                                                                                                value :
+                                                                                                    [
+                                                                                                        ''${ _environment-variable "ECHO" } "- path: ${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.concatStringsSep " / " value.path ) }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  status: DELAYED"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  script: ${ value.value.shell-script }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  tests: ${ value.value.tests }"''
+                                                                                                        ''${ value.value.tests }/observe.wrapped.sh | ${ _environment-variable "YQ" } --yaml-output "{observe:.}" | ${ _environment-variable "SED" } "s#^#  #"''
+                                                                                                    ] ;
+                                                                                            in builtins.map mapper metrics.delayed ;
+                                                                                    error =
+                                                                                        let
+                                                                                            mapper =
+                                                                                                value :
+                                                                                                    [
+                                                                                                        ''${ _environment-variable "ECHO" } "- path: ${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.concatStringsSep " / " value.path ) }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  status: ERROR"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  script: ${ value.value.shell-script }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  tests: ${ value.value.tests }"''
+                                                                                                        ''${ value.value.tests }/observe.wrapped.sh | ${ _environment-variable "YQ" } --yaml-output "{observe:.}" | ${ _environment-variable "SED" } "s#^#  #"''
+                                                                                                        "exit 64"
+                                                                                                    ] ;
+                                                                                            in builtins.map mapper metrics.error ;
+                                                                                    failure =
+                                                                                        let
+                                                                                            mapper =
+                                                                                                value :
+                                                                                                    [
+                                                                                                        ''${ _environment-variable "ECHO" } "- path: ${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.concatStringsSep " / " value.path ) }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  status: FAILURE"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  script: ${ value.value.shell-script }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  tests: ${ value.value.tests }"''
+                                                                                                        ''${ value.value.tests }/observe.wrapped.sh | ${ _environment-variable "YQ" } --yaml-output "{observe:.}" | ${ _environment-variable "SED" } "s#^#  #"''
+                                                                                                        "exit 64"
+                                                                                                    ] ;
+                                                                                            in builtins.map mapper metrics.failure ;
+                                                                                    success =
+                                                                                        let
+                                                                                            mapper =
+                                                                                                value :
+                                                                                                    [
+                                                                                                        ''${ _environment-variable "ECHO" } "- path: ${ builtins.replaceStrings [ "\"" ] [ "\\\"" ] ( builtins.concatStringsSep " / " value.path ) }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  status: SUCCESS"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  script: ${ value.value.shell-script }"''
+                                                                                                        ''${ _environment-variable "ECHO" } "  tests: ${ value.value.tests }"''
+                                                                                                        ''${ value.value.tests }/observe.wrapped.sh | ${ _environment-variable "YQ" } --yaml-output "{observe:.}" | ${ _environment-variable "SED" } "s#^#  #"''
+                                                                                                    ] ;
+                                                                                            in builtins.map mapper metrics.success ;
+                                                                                    in "makeWrapper ${ pkgs.writeShellScript "observe.sh" ( builtins.concatStringsSep " &&\n\t" ( builtins.concatLists ( builtins.concatLists [ error failure success delayed ] ) ) ) } ${ _environment-variable "OUT" }/observe.wrapped.sh --set ECHO ${ _environment-variable "ECHO" } --set SED ${ _environment-variable "SED" } --set YQ ${ _environment-variable "YQ" }"
+                                                                            )
+                                                                        ] ;
+                                                                metrics =
+                                                                    _visitor
+                                                                        {
+                                                                            lambda =
+                                                                                path : value :
+                                                                                    let
+                                                                                        delayed = builtins.pathExists "${ point.tests }/DELAYED" && ! ( builtins.pathExists "${ point.tests }/ERROR" || builtins.pathExists "${ point.tests }/FAILURE" || builtins.pathExists "${ point.tests }/SUCCESS" ) ;
+                                                                                        failure = builtins.pathExists "${ point.tests }/FAILURE" && ! ( builtins.pathExists "${ point.tests }/DELAYED" || builtins.pathExists "${ point.tests }/ERROR" || builtins.pathExists "${ point.tests }/SUCCESS" ) ;
+                                                                                        no = [ ] ;
+                                                                                        point = value derivation ;
+                                                                                        success = builtins.pathExists "${ point.tests }/SUCCESS" && ! ( builtins.pathExists "${ point.tests }/DELAYED" || builtins.pathExists "${ point.tests }/ERROR" || builtins.pathExists "${ point.tests }/FAILURE" ) ;
+                                                                                        yes = [ { path = path ; value = point ; } ] ;
+                                                                                        in
+                                                                                            {
+                                                                                                all = yes ;
+                                                                                                delayed = if delayed then yes else no ;
+                                                                                                error = if ! ( delayed || failure || success ) then yes else no ;
+                                                                                                failure = if failure then yes else no ;
+                                                                                                success = if success then yes else no ;
+                                                                                            } ;
+                                                                            null =
+                                                                                    path : value :
+                                                                                    {
+                                                                                        all = [ ] ;
+                                                                                        delayed = [ ] ;
+                                                                                        error = [ ] ;
+                                                                                        failure = [ ] ;
+                                                                                        success = [ ] ;
+                                                                                    } ;
+                                                                            list =
+                                                                                path : list :
+                                                                                    {
+                                                                                        all = builtins.concatLists ( builtins.map ( l : l.all ) list ) ;
+                                                                                        delayed = builtins.concatLists ( builtins.map ( l : l.delayed ) list ) ;
+                                                                                        error = builtins.concatLists ( builtins.map ( l : l.error ) list ) ;
+                                                                                        failure = builtins.concatLists ( builtins.map ( l : l.failure ) list ) ;
+                                                                                        success = builtins.concatLists ( builtins.map ( l : l.success ) list ) ;
+                                                                                    } ;
+                                                                            set =
+                                                                                path : set :
+                                                                                    {
+                                                                                        all = builtins.concatLists ( builtins.attrValues ( builtins.mapAttrs ( name : value : value.all ) set ) ) ;
+                                                                                        delayed = builtins.concatLists ( builtins.attrValues ( builtins.mapAttrs ( name : value : value.delayed ) set ) ) ;
+                                                                                        error = builtins.concatLists ( builtins.attrValues ( builtins.mapAttrs ( name : value : value.error ) set ) ) ;
+                                                                                        failure = builtins.concatLists ( builtins.attrValues ( builtins.mapAttrs ( name : value : value.failure ) set ) ) ;
+                                                                                        success = builtins.concatLists ( builtins.attrValues ( builtins.mapAttrs ( name : value : value.success ) set ) ) ;
+                                                                                    } ;
+                                                                        }
+                                                                        primary.shell-scripts ;
+                                                                in
+                                                                    ''
+                                                                        ${ pkgs.coreutils }/bin/mkdir $out &&
+                                                                            makeWrapper ${ pkgs.writeShellScript "constructor.sh" constructor } $out/constructor.wrapped.sh --set ECHO ${ pkgs.coreutils }/bin/echo --set LN ${ pkgs.coreutils }/bin/ln --set MAKE_WRAPPER ${ pkgs.makeWrapper } --set OUT $out --set TOUCH ${ pkgs.coreutils }/bin/touch --set SED ${ pkgs.gnused }/bin/sed --set YQ ${ pkgs.yq }/bin/yq &&
+                                                                            $out/constructor.wrapped.sh &&
+                                                                            ${ pkgs.coreutils }/bin/echo '${ builtins.toJSON metrics }' | ${ pkgs.yq }/bin/yq --yaml-output > $out/metrics.yaml
+                                                                    '' ;
+                                                        name = "tests" ;
+                                                        nativeBuildInputs = [ pkgs.makeWrapper ] ;
+                                                        src = ./. ;
+                                                    } ;
+                                        } ;
+                                pkgs = builtins.import nixpkgs { system = system ; } ;
                             in
                                 {
+                                    apps =
+                                        {
+                                            foobar =
+                                                {
+                                                    type = "app" ;
+                                                    program = "${ foobar.tests }/observe.wrapped.sh" ;
+                                                } ;
+                                        } ;
                                     checks =
                                         {
                                             foobar =
                                                 pkgs.stdenv.mkDerivation
                                                     {
                                                         installPhase =
-                                                            let
-                                                                shell-scripts =
-                                                                    lib
-                                                                        {
-                                                                            shell-scripts =
-                                                                                {
-                                                                                    file1 =
-                                                                                        { shell-script , ... } :
-                                                                                            shell-script
-                                                                                                {
-                                                                                                    environment =
-                                                                                                        { string , ... } :
-                                                                                                            [
-                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
-                                                                                                            ] ;
-                                                                                                    script = self + "/scripts/file.sh" ;
-                                                                                                } ;
-                                                                                    file2 =
-                                                                                        { shell-script , ... } :
-                                                                                            shell-script
-                                                                                                {
-                                                                                                    environment =
-                                                                                                        { string , ... } :
-                                                                                                            [
-                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
-                                                                                                            ] ;
-                                                                                                    script = self + "/scripts/file.sh" ;
-                                                                                                } ;
-                                                                                    foo =
-                                                                                        [
-                                                                                            {
-                                                                                                bar =
-                                                                                                    { shell-script , ... } :
-                                                                                                        shell-script
-                                                                                                            {
-                                                                                                                environment =
-                                                                                                                    { originator-pid , path-int , path-string , standard-input , shell-scripts , string } :
-                                                                                                                        [
-                                                                                                                            ( string "JQ" "${ pkgs.jq }/bin/jq" )
-                                                                                                                            ( shell-scripts "FOOBAR" ( shell-scripts : builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.foo ) 0 ) ) )
-                                                                                                                            ( originator-pid { } )
-                                                                                                                            ( path-int "PATH_INT" 1 )
-                                                                                                                            ( path-string "PATH_STRING" 2 )
-                                                                                                                            ( standard-input { } )
-                                                                                                                            ( string "TEMPLATE_FILE" ( self + "/scripts/foobar.json" ) )
-                                                                                                                            ( string "YQ" "${ pkgs.yq }/bin/yq" )
-                                                                                                                        ] ;
-                                                                                                                script = self + "/scripts/foobar.sh" ;
-                                                                                                                tests =
-                                                                                                                    {
-                                                                                                                        main =
-                                                                                                                            ignore :
-                                                                                                                                {
-                                                                                                                                    standard-output = builtins.readFile ( self + "/expected/standard-output" ) ;
-                                                                                                                                } ;
-                                                                                                                    } ;
-                                                                                                            } ;
-                                                                                            }
-                                                                                        ] ;
-                                                                                    init =
-                                                                                        { shell-script , ... } :
-                                                                                            shell-script
-                                                                                                {
-                                                                                                    environment =
-                                                                                                        { string , ... } :
-                                                                                                            [
-                                                                                                                ( string "MKDIR" "${ pkgs.coreutils }/bin/mkdir" )
-                                                                                                            ] ;
-                                                                                                    script = self + "/scripts/init.sh" ;
-                                                                                                } ;
-                                                                                    noop =
-                                                                                        { shell-script , ... } :
-                                                                                            shell-script
-                                                                                                {
-                                                                                                    environment =
-                                                                                                        { string , ... } :
-                                                                                                            [
-                                                                                                                ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
-                                                                                                            ] ;
-                                                                                                    script = self + "/scripts/noop.sh" ;
-                                                                                                } ;
-                                                                                    # temporary =
-                                                                                    #     { temporary , ... } :
-                                                                                    #         temporary
-                                                                                    #             {
-                                                                                    #                 init = shell-scripts : shell-scripts.init ;
-                                                                                    #                 release = shell-scripts : shell-scripts.noop ;
-                                                                                    #                 post = shell-scripts : shell-scripts.noop ;
-                                                                                    #                 tests = [ ] ;
-                                                                                    #           } ;
-                                                                                } ;
-                                                                        } ;
-                                                                in
-                                                                    ''
-                                                                        ${ pkgs.coreutils }/bin/touch $out &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.init } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ shell-scripts.shell-scripts.noop } &&
-                                                                            ${ pkgs.coreutils }/bin/echo ${ builtins.getAttr "bar" ( builtins.elemAt ( shell-scripts.shell-scripts.foo ) 0 ) }
-                                                                            exit 66
-                                                                    '' ;
+                                                            ''
+                                                                ${ pkgs.coreutils }/bin/touch $out &&
+                                                                    ${ pkgs.coreutils }/bin/echo ${ foobar.shell-scripts.foobar } &&
+                                                                    ${ pkgs.coreutils }/bin/echo ${ foobar.tests } &&
+                                                                    if [ -f ${ foobar.tests }/SUCCESS ]
+                                                                    then
+                                                                        ${ pkgs.coreutils }/bin/echo There was success in ${ foobar.tests }.
+                                                                    elif [ -f ${ foobar.tests }/DELAYED ]
+                                                                    then
+                                                                        ${ pkgs.coreutils }/bin/echo There was delay in ${ foobar.tests }.
+                                                                    elif [ -f ${ foobar.tests }/FAILURE ]
+                                                                    then
+                                                                        ${ pkgs.coreutils }/bin/echo There was failure in ${ foobar.tests }. >&2 &&
+                                                                            exit 61
+                                                                    else
+                                                                        ${ pkgs.coreutils }/bin/echo There was error in ${ foobar.tests }. >&2 &&
+                                                                            exit 60
+                                                                    fi &&
+                                                                    ${ pkgs.coreutils }/bin/echo CACHE CONFIG ${ foobar.shell-scripts.cache.config } &&
+                                                                    ${ pkgs.coreutils }/bin/echo CACHE IDENTITY ${ foobar.shell-scripts.cache.identity } &&
+                                                                    ${ pkgs.coreutils }/bin/echo CACHE PIN ${ foobar.shell-scripts.cache.pin } &&
+                                                                    ${ pkgs.coreutils }/bin/echo CACHE PRIVATE ${ foobar.shell-scripts.cache.private } &&
+                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY IDENTITY ${ foobar.shell-scripts.temporary.identity } &&
+                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY PIN ${ foobar.shell-scripts.temporary.pin } &&
+                                                                    ${ pkgs.coreutils }/bin/echo TEMPORARY PRIVATE ${ foobar.shell-scripts.temporary.private } &&
+                                                                    exit 99
+                                                            '' ;
                                                         name = "foobar" ;
                                                         src = ./. ;
                                                     } ;
