@@ -24,6 +24,25 @@
                                             {
                                                 cache =
                                                     {
+                                                        config =
+                                                            { cache , ... } :
+                                                                cache
+                                                                    {
+                                                                        init =
+                                                                            {
+                                                                                profile =
+                                                                                    { shell-script , string , ... } :
+                                                                                        [
+                                                                                            ( string "ECHO" "${ pkgs.coreutils }/bin/echo" )
+                                                                                            ( shell-script "IDENTITY" ( shell-scripts : shell-scripts.cache.private ) )
+                                                                                            ( string "YQ" "${ pkgs.yq }/bin/yq" )
+                                                                                        ] ;
+                                                                                script =
+                                                                                    ''
+                                                                                        ${ _environment-variable "ECHO" } '{ "Host" : "github.com" , "User" : "git" , "IdentityFile" : "${ _environment-variable "IDENTITY_FILE" }" }' | ${ _environment-variable "YQ" } --yaml-output > /mount/target
+                                                                                    '' ;
+                                                                            } ;
+                                                                    } ;
                                                         identity =
                                                             { cache , ... } :
                                                                 cache
@@ -656,6 +675,7 @@
                                                                         ${ pkgs.coreutils }/bin/echo There was error in ${ foobar.tests }. >&2 &&
                                                                             exit 60
                                                                     fi &&
+                                                                    ${ pkgs.coreutils }/bin/echo CACHE CONFIG ${ foobar.shell-scripts.cache.config } &&
                                                                     ${ pkgs.coreutils }/bin/echo CACHE IDENTITY ${ foobar.shell-scripts.cache.identity } &&
                                                                     ${ pkgs.coreutils }/bin/echo CACHE PIN ${ foobar.shell-scripts.cache.pin } &&
                                                                     ${ pkgs.coreutils }/bin/echo CACHE PRIVATE ${ foobar.shell-scripts.cache.private } &&
