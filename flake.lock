@@ -9,16 +9,16 @@
         "visitor": "visitor_2"
       },
       "locked": {
-        "lastModified": 1746213995,
-        "narHash": "sha256-bidCPHoYsAfIxY0MjdiOcJ6gz6ni30Rx37jOqm9Oxuo=",
+        "lastModified": 1746235045,
+        "narHash": "sha256-TLulOYPPLUleUL5w8zuWfKukrMfcvdekkZkkkF5E8wA=",
         "owner": "viktordanek",
         "repo": "cache",
-        "rev": "b09c3391b41bf4b3091dfe19c418af3714b93c47",
+        "rev": "4a00fae5f00425df54ae0a66802c2f081cb16adb",
         "type": "github"
       },
       "original": {
         "owner": "viktordanek",
-        "ref": "scratch/c2a9ccb1-8bc6-4541-ad80-3a3d048b2a02",
+        "ref": "issue/6-new-implementation",
         "repo": "cache",
         "type": "github"
       }
